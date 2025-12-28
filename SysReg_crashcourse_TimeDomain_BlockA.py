@@ -563,7 +563,7 @@ display(Markdown(rf'$|\lambda_1| = \omega_0 = {np.abs(P_2d.poles()[0]):.3f}$'))
 # 1. $\zeta>1$ is overdamped
 # 2. $\zeta=1$ is critically damped
 # 3. $\zeta\in [0,1]$ is underdamped
-# 4. and $\zeta<1$ is unstable.
+# 4. and $\zeta<0$ is unstable.
 # 
 # Also the speed of the response is defined by $\omega_0$. We'll plot a few of these.
 

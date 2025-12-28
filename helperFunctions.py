@@ -29,3 +29,24 @@ def vector_field(A, v1, v2, ax, n=8):
     _,  =ax.plot([0, -20*v2[0,0]], [0, -20*v2[1,0]], 'k--')
     ax.set(xlim=[-1,1], ylim=[-1,1], xlabel="$x_1$", ylabel="$x_2$")
     ax.legend(handles=[l1, l2], loc=(1.05, .8))
+
+def drawContour(ax, cntr, c=[0.1,0.7,0.8], ls='--'):## Plot contour
+    ax.plot(cntr.real, cntr.imag, ls, color=c)
+    # ax.set(aspect='equal', ylabel="Im", xlabel="Re")
+
+    ## Plot clockwise arrows
+    arrowIdx = np.linspace(start=0, stop=len(cntr), num=6, endpoint=False, dtype=int)
+
+    for idx in range(len(arrowIdx)):
+        ax.annotate("", xytext=(np.real(cntr[arrowIdx[idx]]), np.imag(cntr[arrowIdx[idx]])), 
+                    xy=(np.real(cntr[arrowIdx[idx]+1]), np.imag(cntr[arrowIdx[idx]+1])),
+                    arrowprops=dict(arrowstyle="->"))
+    ax.set_aspect('equal')
+
+def unwrap_angle(ang):
+    for idx in range(ang.size - 1):
+        if ang[idx+1] - ang[idx] > 180:
+            ang[idx+1:] -= 360
+        elif ang[idx+1] - ang[idx] < -180:
+            ang[idx+1:] += 360
+    return ang
