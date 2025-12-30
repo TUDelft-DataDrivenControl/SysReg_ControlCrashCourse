@@ -7,19 +7,18 @@
 
 
 # %%
+%matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-# %matplotlib inline
 plt.rcParams.update({ 'text.usetex':        False,              'mathtext.fontset':         'cm',
                       'font.size':          12.0,               'axes.labelsize':           'medium',
                       'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
                       'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
                       'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
                       'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'savefig.dpi':        300,                'savefig.bbox':             'tight',
-                      'savefig.pad_inches': 0.05,               'savefig.transparent':      True})
+                      'animation.html':     'jshtml'})
 
-from IPython.display import display, Markdown, HTML
+from IPython.display import display, Markdown
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -63,25 +62,25 @@ from helperFunctions import *
 # 
 
 # %%
+## Eigenvalues
 sig1 = -0.8
 sig2 = 3 + 15j
 sig3 = -0.5 + 5j
 
-###### Processing and Plotting #########
+###### Plotting #########
 fig, ax = plt.subplots(1,3)
-idx = 0
-for sig in [sig1, sig2, sig3]:
-    t = np.linspace(0, 3/abs(np.real(sig)), num=300)
-    if np.iscomplex(sig):
-        l1, = ax[idx].plot(t, np.exp(np.real(sig)*t), 'r--', label=f"$e^{r"{"}{sig.real}t{r"}"}$")
-        ax[idx].plot(t, -np.exp(np.real(sig)*t), 'r--')
-        l2, = ax[idx].plot(t, 2*np.cos(np.imag(sig)*t), 'k', alpha=0.3, label=f"$2\cos({sig.imag} t)$")
+for sig, idx in zip([sig1, sig2, sig3], range(3)):
+    t = np.linspace(0, 3/abs(np.real(sig)), num=300) # Adapt to convergence speed
+    if np.iscomplex(sig): # Plot decomposition
+        l1, = ax[idx].plot(t, np.exp(sig.real * t), 'r--', label=f"$e^{r"{"}{sig.real}t{r"}"}$") # Upper envelope
+        ax[idx].plot(t, -np.exp(sig.real * t), 'r--') # Lower envelope
+        l2, = ax[idx].plot(t, 2*np.cos(sig.imag * t), 'k', alpha=0.2, label=f"$2\cos({sig.imag} t)$") # Oscillation
         ax[idx].legend(handles=[l1, l2])
-    ax[idx].plot(t, np.exp(sig*t))
+    ax[idx].plot(t, np.exp(sig * t), 'k') # Trajectory
     ax[idx].set(title=f"$\lambda = {sig}$", xlabel="$t$")
-    idx += 1
 
-_ = ax[0].set_ylabel("$y(t)$")
+ax[0].set_ylabel("$y(t)$")
+display(fig)
 
 
 # %% [markdown]
@@ -102,7 +101,7 @@ _ = ax[0].set_ylabel("$y(t)$")
 # ### Block diagrams
 # &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Pixel perfect ways to visualise systems*
 # 
-# ![Slide about block diagram elements](BlockDiagEls.png)
+# ![Slide about block diagram elements](figures/BlockDiagEls.png)
 # 
 # It's a nice sanity check that any fundamental block scheme of an $n$-th order system has $n$ integrators.
 # 
@@ -196,8 +195,8 @@ traj[:,[0]] = rng.rand(2,1)
 h = 0.1
 for idx in range(max(traj.shape)-1):
     traj[:, idx+1] = RK4(x=traj[:, idx], dx=lambda x: A@x, h=h)
-_ = ax[0].plot(traj[0,:], traj[1,:])
-_ = ax[0].scatter(traj[0,0], traj[1,0], marker='o', color='tab:blue', facecolors='none')
+ax[0].plot(traj[0,:], traj[1,:])
+ax[0].scatter(traj[0,0], traj[1,0], marker='o', color='tab:blue', facecolors='none')
 
 T = np.arange(max(traj.shape))*h
 l1, = ax[1].plot(T, traj[0,:], label="$x_1$")
@@ -210,8 +209,8 @@ if np.iscomplex(lambda1):
 else:
     ax[1].legend(handles=[l1,l2])
 
-_ = ax[1].set(xlim=[0, max(T)], title="State trajectory", xlabel="$t$", ylabel="$x$")
-
+ax[1].set(xlim=[0, max(T)], title="State trajectory", xlabel="$t$", ylabel="$x$")
+display(fig)
 
 # %% [markdown]
 # ### How to be an eigenvalue wizard
@@ -246,6 +245,7 @@ _ = ax[1].set(xlim=[0, max(T)], title="State trajectory", xlabel="$t$", ylabel="
 # The impulse signal is primarily used to see the transient behaviour of the system and the step functions shows the transient and steady state behaviour. Look at these plots to see! We're even able to seperate the transient from the steady state for the step!
 
 # %%
+# Create random system
 P_res = cm.rss(20)
 P_res.D = [rng.rand()]
 
@@ -278,22 +278,23 @@ stpStead[stpResponse.time >= 0] = (P_res.D - P_res.C@lin.inv(P_res.A)@P_res.B)[0
 ####### Plotting #######
 fig, ax = plt.subplots(3,2, sharex='col', figsize=[11, 7])
 
-_ = ax[0,0].set(title="Impulse response", ylabel="$u$")
-_ = ax[1,0].set(ylabel="$y$")
-_ = ax[2,0].set(xlabel="$t/s$", ylabel="$y$ - decomposed")
-_ = ax[0,0].plot(impResponse.time, impResponse.inputs)
-_ = ax[1,0].plot(impResponse.time, impResponse.outputs)
+ax[0,0].set(title="Impulse response", ylabel="$u$")
+ax[1,0].set(ylabel="$y$")
+ax[2,0].set(xlabel="$t/s$", ylabel="$y$ - decomposed")
+ax[0,0].plot(impResponse.time, impResponse.inputs)
+ax[1,0].plot(impResponse.time, impResponse.outputs)
 l1, = ax[2,0].plot(impResponse.time, impTrans, label="Transient")
 l2, = ax[2,0].plot(impResponse.time, np.squeeze(P_res.D*impResponse.inputs), '--', label="Feedthrough")
-_ = ax[2,0].legend(handles=[l1,l2])
+ax[2,0].legend(handles=[l1,l2])
 
-_ = ax[0,1].set(title="Step response")
-_ = ax[2,1].set(xlabel="$t / s$")
-_ = ax[0,1].plot(stpResponse.time, stpResponse.inputs)
-_ = ax[1,1].plot(stpResponse.time, stpResponse.outputs)
+ax[0,1].set(title="Step response")
+ax[2,1].set(xlabel="$t / s$")
+ax[0,1].plot(stpResponse.time, stpResponse.inputs)
+ax[1,1].plot(stpResponse.time, stpResponse.outputs)
 l1, = ax[2,1].plot(stpResponse.time, stpTrans, label="Transient")
 l2, = ax[2,1].plot(stpResponse.time, stpStead, '--', label="Steady State")
-_ = ax[2,1].legend(handles=[l1,l2])
+ax[2,1].legend(handles=[l1,l2])
+display(fig)
 
 # %% [markdown]
 # Decomposing a signal into a transient and steady state part? How is that possible? It really comes down to seperating the time dependent and time independent parts. By convolution of the input, we can express the state and output trajectory of any LTI system as $$ x(t) = e^{At}x_0 + \int_0^t e^{A(t-\tau)}Bu(\tau)d\tau$$ 
@@ -329,7 +330,7 @@ _ = ax[2,1].legend(handles=[l1,l2])
 # ## Feedback control
 # WOW ARE WE GOING TO DO CONTROL NOW??? *FINALLY*???? Yes! No... There's one more difference we need to explain. There are two types of feedback control, output and state feedback. The difference is in the name and here you also see the difference in a block diagram for a plant/process/system, $P$, and a controller, $C$.
 # 
-# ![output vs state feedback](xyFB.svg)
+# ![output vs state feedback](figures/xyFB.svg)
 # 
 # Output feedback is stuff like PID, or in other terms: disgusting. We'll look at state feedback now! *The real stuff.*
 
@@ -348,7 +349,8 @@ unforced_reg = cm.forced_response(sysdata=P_reg,
 ####### Plotting #######
 fig, ax = plt.subplots()
 ax.plot(unforced_reg.time, unforced_reg.outputs)
-_ = ax.set(title="Unforced open loop response of $P$, non-zero initialisation", xlabel="$t/s$", ylabel="$y$")
+ax.set(title="Unforced open loop response of $P$, non-zero initialisation", xlabel="$t/s$", ylabel="$y$")
+display(fig)
 
 # %% [markdown]
 # 
@@ -381,13 +383,14 @@ fig, ax = plt.subplots()
 ax.plot(unforced_reg.time, unforced_reg.outputs, '--', color="tab:orange", label="Unforced")
 ax.plot(forced_reg.time, forced_reg.outputs, color="tab:blue", label="Closed Loop")
 ax.legend()
-_ = ax.set(title="Closed loop response of $P$ and $K$, non-zero initialisation", xlabel="$t/s$", ylabel="$y$")
+ax.set(title="Closed loop response of $P$ and $K$, non-zero initialisation", xlabel="$t/s$", ylabel="$y$")
+display(fig)
 
 # %% [markdown]
 # 
 # However, regulating to zero is boring, I want to be able to tell my system to do a backflip! We need to add a reference, and I'll spoil that we also need a reference gain $k_f$:
 # 
-# ![Reference tracking](refTrackCL.svg)
+# ![Reference tracking](figures/refTrackCL.svg)
 # 
 # So how does this work then... Same substitution as before!
 # $$ \dot x = Ax + Bu = Ax + B(k_f r - Kx) = (A-BK) x + Bk_f r.$$
@@ -417,8 +420,9 @@ ax[0].plot(response_sqr_ref.time, response_sqr_ref.outputs, color="tab:blue", la
 ax[1].plot(response_saw_ref.time, response_saw_ref.inputs , '--', color="tab:orange", label="Reference")
 ax[1].plot(response_saw_ref.time, response_saw_ref.outputs, color="tab:blue", label="CL System")
 ax[0].legend()
-_ = ax[0].set(title="Closed loop reference tracking", ylabel="$y$")
-_ = ax[1].set(xlabel="$t/s$", ylabel="$y$")
+ax[0].set(title="Closed loop reference tracking", ylabel="$y$")
+ax[1].set(xlabel="$t/s$", ylabel="$y$")
+display(fig)
 
 # %% [markdown]
 # 
@@ -429,7 +433,7 @@ _ = ax[1].set(xlabel="$t/s$", ylabel="$y$")
 # 
 # So if out model is incorrect, what does that mean for our controller? Simply said, it's not exactly what we want, but *it's close*. To get it perfect however, we need to add an output feedback part to our state feedback controller. An integrator of the reference-output-error to be precise. This integrator wil drive the integral of the error, $z$, to zero, meaning that the error will be zero. I'll stop talking now and show the block diagram so you actually understand.
 # 
-# ![Integral action](IntActCL.svg)
+# ![Integral action](figures/IntActCL.svg)
 # 
 # Sooooo maths time. Substitute everything into everything, yada yada, this is largely what control engineers do. Also assume D=0. Lets start with plant equations and work our way backwards through the block diagram.
 # 
@@ -465,8 +469,9 @@ ax[1].plot(response_saw_ref.time, response_saw_ref.inputs , '--', color="tab:ora
 ax[1].plot(response_saw_ref.time, response_saw_ref.outputs, color="tab:blue", label="CL System")
 ax[1].plot(response_saw_int.time, response_saw_int.outputs, ':', color="tab:green", label="System + integral")
 ax[0].legend()
-_ = ax[0].set(title="Closed loop reference tracking with integral action", ylabel="$y$")
-_ = ax[1].set(xlabel="$t/s$", ylabel="$y$")
+ax[0].set(title="Closed loop reference tracking with integral action", ylabel="$y$")
+ax[1].set(xlabel="$t/s$", ylabel="$y$")
+display(fig)
 
 # %% [markdown]
 # And now we face dreadful reality and perturb our plant a little!
@@ -518,9 +523,9 @@ ax[1].plot(response_saw_ref_pert.time, response_saw_ref_pert.inputs , '--', colo
 ax[1].plot(response_saw_ref_pert.time, response_saw_ref_pert.outputs, color="tab:blue", label="CL System")
 ax[1].plot(response_saw_int_pert.time, response_saw_int_pert.outputs, ':', color="tab:green", label="System + integral")
 ax[0].legend()
-_ = ax[0].set(title="Closed loop reference tracking with perturbed plant", ylabel="$y$")
-_ = ax[1].set(xlabel="$t/s$", ylabel="$y$")
-
+ax[0].set(title="Closed loop reference tracking with perturbed plant", ylabel="$y$")
+ax[1].set(xlabel="$t/s$", ylabel="$y$")
+display(fig)
 
 # %% [markdown]
 # See how bad the system without the integral action performs? (If not, randomise the plant again...)
@@ -557,6 +562,7 @@ ax.legend(handles=[s1, s2])
 
 display(Markdown(rf'$\lambda_1 = -\zeta\omega_0+\omega_0\sqrt{"{"}\zeta^2-1{"}"} = {-zeta*omega0 + omega0*np.emath.sqrt(zeta**2-1):.3f}$'))
 display(Markdown(rf'$|\lambda_1| = \omega_0 = {np.abs(P_2d.poles()[0]):.3f}$'))
+display(fig)
 
 # %% [markdown]
 # Now lets look at the step responses! We have three (or four) terms for intervals of $\zeta$:
@@ -584,7 +590,8 @@ for omega0, axIdx1 in zip(Omega0, range(len(Omega0))):
 
 [ax[0,p].set(title=f"$\zeta={Zeta[p]}$") for p in range(len(Zeta))]
 [ax[p,0].set(ylabel=f"$\omega_0={Omega0[p]}$") for p in range(len(Omega0))]
-_ = [ax[2,p].set(xlabel=f"$t/s$") for p in range(len(Zeta))]
+[ax[2,p].set(xlabel=f"$t/s$") for p in range(len(Zeta))]
+display(fig)
 
 # %% [markdown]
 # ### Why are second order systems so important?
@@ -622,7 +629,8 @@ ax[0].legend()
 l0 = ax[1].plot(response_dom.time, response_dom.outputs, color="tab:blue", label="Original sys.")
 l1 = ax[1].twinx().plot(response_dom_2d.time, response_dom_2d.outputs, '--', color="tab:orange", label="2nd order sys.")
 ax[1].legend(handles = [l0[0], l1[0]])
-_ = ax[1].set(title="Step response (ignore scaling)", xlabel="t/s")#, yticks=[])
+ax[1].set(title="Step response (ignore scaling)", xlabel="t/s")#, yticks=[])
+display(fig)
 
 # %% [markdown]
 # ## Art is for suckers and should be optimised
@@ -682,7 +690,8 @@ ax[0].set(ylabel="$y$")
 
 ax[1].plot(response_pp.time , (-K_pp  @ response_pp.states)[0,:]  + kf_pp*response_pp.inputs, color="tab:blue", label="Pole Placement")
 ax[1].plot(response_lqr.time, (-K_lqr @ response_lqr.states)[0,:] + kf_lqr*response_lqr.inputs, color="tab:brown", label="LQR")
-_=ax[1].set(ylabel="$u$", xlabel="$t$ / s")
+ax[1].set(ylabel="$u$", xlabel="$t$ / s")
+display(fig)
 
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture 7</div>
@@ -724,7 +733,7 @@ P_obs = cm.rss(4, strictly_proper=True)
 nx = len(P_obs.poles())
 x0 = rng.randn(nx,1)
 
-T_obs = np.linspace(0., 20., 400)
+T_obs = np.linspace(0., 5./abs(P_obs.poles().real.max()), 400)
 
 ## Check observability!
 def isObservable(A, C):
@@ -759,8 +768,8 @@ ax[0].legend(handles=[
     ax[nx-1].plot(response_obs.time, response_obs.states[nx-1, :], 'k', alpha=.3, label=r"$x$")[0],
     ax[nx-1].plot(response_obs.time, response_obs.states[nx-1+nx, :], 'k--', label=r"$\hat x$")[0]
     ])
-_ = ax[nx-1].set(ylabel = f"$x_{nx-1}$", xlabel = "$t$ / s")
-
+ax[nx-1].set(ylabel = f"$x_{nx-1}$", xlabel = "$t$ / s")
+display(fig)
 
 # %% [markdown]
 # ### Quicker than thou
@@ -771,6 +780,9 @@ obsv_poles_slow = P_obs.poles().real * .9 + P_obs.poles().imag * 1e-5
 obsv_poles_fast = P_obs.poles().real * 2. + P_obs.poles().imag * 1e-5
 L_slow = cm.place(P_obs.A.transpose(), P_obs.C.transpose(), obsv_poles_slow).transpose()
 L_fast = cm.place(P_obs.A.transpose(), P_obs.C.transpose(), obsv_poles_fast).transpose()
+
+T_obs = np.linspace(0., 10./abs(obsv_poles_fast.real.max()), 400)
+obsIn = np.sin(T_obs)**1.7
 
 P_obs_aug_slow = cm.ss(np.block([[P_obs.A,      np.zeros_like(P_obs.A)], # A
                                  [L_slow@P_obs.C,    P_obs.A - L_slow@P_obs.C]]),
@@ -815,13 +827,15 @@ ax[0,1].set_title("Faster observer")
 
 e_slow = lin.eigvals(P_obs.A - L_slow @ P_obs.C)
 e_fast = lin.eigvals(P_obs.A - L_fast @ P_obs.C)
+display(fig)
 
 fig, ax = plt.subplots()
-_ = ax.legend(handles= [
+ax.legend(handles= [
     ax.scatter(P_obs.poles().real, P_obs.poles().imag, s=100, marker='x', color='tab:blue', label="System poles"),
     ax.scatter(e_slow.real, e_slow.imag, s=100, marker='+', color='tab:orange', label="Slow error poles"),
     ax.scatter(e_fast.real, e_fast.imag, s=100, marker='1', color='tab:green', label="Fast error poles"),
 ])
+display(fig)
 
 # %% [markdown]
 # ## Connecting the dots
@@ -959,6 +973,8 @@ for sys, idx, title in zip([CL_FBctrl, CL_FBctrl_int, CL_FBctrl_pert, CL_FBctrl_
     ax[idx].plot(response.time, response.inputs, 'k--')
     ax[idx].plot(response.time, response.outputs, 'k')
     ax[idx].set(ylabel="$y$", title=title)
+
+display(fig)
 
 # %% [markdown]
 # Run the previous cell a few times... fun fact: there is no generic fix for control problems...

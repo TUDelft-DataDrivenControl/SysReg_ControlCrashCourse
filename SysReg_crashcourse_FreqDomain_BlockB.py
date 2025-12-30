@@ -6,7 +6,7 @@
 # # Crash course for the control uninitiated for Systeem & Regeltechniek
 
 # %%
-%matplotlib ipympl
+%matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams.update({ 'mathtext.fontset':         'cm',
@@ -21,7 +21,7 @@ plt.rcParams.update({ 'mathtext.fontset':         'cm',
 from matplotlib.ticker import MultipleLocator
 from matplotlib.gridspec import GridSpec
 import matplotlib.animation as animation
-from IPython.display import display, Markdown, HTML, YouTubeVideo
+from IPython.display import display, Markdown
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -91,7 +91,7 @@ from helperFunctions import *
 # ### Transfer functions for controls
 # Lets look at a very general control scheme:
 # 
-# ![General feedback loop](CLsys_general.svg)
+# ![General feedback loop](figures/CLsys_general.svg)
 # 
 # with the block and signals:
 # - $F$ : feedforward controller
@@ -121,7 +121,8 @@ from helperFunctions import *
 # Just to be clear, we have a transfer function $G(s)$ that maps the complex plane to the complex plane, i.e.
 # $$ G: \mathbb{C} \rightarrow \mathbb{C}.$$
 # Then we have the steady state output being $Y(s) = G_{yu}(s)U(s)$, so for a given $s$, $Y(s)$ is the product of two complex numbers $G_{yu}(s)$ and $U(s)$. Remember for complex numbers: multiplication means 
-# multiplying the modulus/magnitude and adding the argument/angle/phase, i.e. $ae^{ci}\;be^{di} = abe^{(c+d)i}$. Likewise, division is division and subtraction, respectively, i.e. $\frac{ae^{ci}}{be^{di}} = \frac{a}{b}e^{(c-d)i}$. These 
+# multiplying the modulus/magnitude and adding the argument/angle/phase, i.e. $ae^{ci}\;be^{di} = abe^{(c+d)i}$. Likewise, division is division and subtraction, respectively, i.e. 
+# $\frac{ae^{ci}}{be^{di}} = \frac{a}{b}e^{(c-d)i}$. These 
 # two rules can be used to combine simple transfer function 'blocks' into more complicated functions. In any case, any input $U(s)$ will be amplified with $|G_{yu}(s)|$ and shifted with $\angle G_{yu}(s)$ to 
 # the output $Y(s)$, because they're multiplied.
 # 
@@ -142,10 +143,7 @@ G1_eval = [G(S) for G in G1]
 ### Plotting ###
 fig = plt.figure(num="Bode plot intro")
 gs = GridSpec(2,2, figure=fig)
-ax = []
-ax.append(fig.add_subplot(gs[:, 0]))
-ax.append(fig.add_subplot(gs[0, 1]))
-ax.append(fig.add_subplot(gs[1, 1]))
+ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
 
 [ax[0].plot(G_eval.real, G_eval.imag, 'x' if n >= 0 else 'o', c='none', mec=f"C{idx}") 
         for G_eval, n, idx in zip(G1_eval, N, range(len(N)))]
@@ -159,6 +157,7 @@ ax[1].set(title="Bode plot", ylabel = "$|G(s)|$")
 ax[2].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[2].yaxis.set_major_locator(MultipleLocator(90))
 ax[0].legend(handles=hnd)
+display(fig)
 
 # %% [markdown]
 # What you should note in the plot above:
@@ -194,10 +193,7 @@ G2_eval = [G(S) for G in G2]
 ### Plotting ###
 fig = plt.figure(num="Bode plot blocks")
 gs = GridSpec(2,2, figure=fig)
-ax = []
-ax.append(fig.add_subplot(gs[:, 0]))
-ax.append(fig.add_subplot(gs[0, 1]))
-ax.append(fig.add_subplot(gs[1, 1]))
+ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
 
 for G_eval in G2_eval:
     ax[0].plot(G_eval.real, G_eval.imag)
@@ -224,6 +220,8 @@ ax[1].set(title="Bode plot", ylabel = "$|G(s)|$")
 ax[2].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[2].yaxis.set_major_locator(MultipleLocator(90))
 
+display(fig)
+
 # %% [markdown]
 # That plot is a lot to take in, I do admit. However, the take-aways are:
 # - poles and zeros are each other inverses,
@@ -245,10 +243,7 @@ om1 = 1.
 
 fig = plt.figure(num="Damping ratio TF")
 gs = GridSpec(2,2, figure=fig)
-ax = []
-ax.append(fig.add_subplot(gs[:, 0]))
-ax.append(fig.add_subplot(gs[0, 1]))
-ax.append(fig.add_subplot(gs[1, 1]))
+ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
 
 hnd = []
 for zeta in np.geomspace(0.05, 10., num=4):
@@ -280,6 +275,8 @@ ax[1].set(title="Bode plot", ylabel = "$|G(s)|$")
 ax[2].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[2].yaxis.set_major_locator(MultipleLocator(90))
 
+display(fig)
+
 # %% [markdown]
 # ### Combining transfer function blocks
 # We're going to design three filters here to wrap up: a notch filter, a lead-lag filter and a PID! First the notch, it consists of a pole pair and a zero pair with the same natural frequency, but 
@@ -306,6 +303,8 @@ ax[1].semilogx(OM, np.angle(G_leadlag_eval_p, deg=True), '--')
 ax[0].set(title="Bode plot - notch filter", ylabel = "$|G(s)|$")
 ax[1].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[1].yaxis.set_major_locator(MultipleLocator(90))
+
+display(fig)
 
 # %% [markdown]
 # You can figure out yourself what color is the poles/zeros <3. Notice how the curves can be 'added' when in reality they're multiplied, because they're plotted on a log scale.
@@ -336,10 +335,12 @@ ax[0].set(title="Bode plot - lead-lag filter", ylabel = "$|G(s)|$")
 ax[1].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[1].yaxis.set_major_locator(MultipleLocator(90))
 
+display(fig)
+
 # %% [markdown]
 # To summarise these configurations of 2nd order systems:
 # 
-# ![2nd order systems table](secondOrderTFs.svg)
+# ![2nd order systems table](figures/secondOrderTFs.svg)
 # 
 # Next, one of the simplest (and most effective) controllers is the PID controller (any controller is secretely a filter). But we have to cast the standard expression into blocks we know:
 # $$ K_p + \frac{K_i}{s} + K_d s = \frac{K_p s + K_i}{s} + K_d s = \frac{K_d s^2 + K_p s + K_i}{s}.$$
@@ -358,6 +359,8 @@ ax[1].semilogx(OM, np.angle(PID1, deg=True), 'k')
 ax[0].set(title="Bode plot - PID", ylabel = "$|G(s)|$")
 ax[1].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[1].yaxis.set_major_locator(MultipleLocator(90))
+
+display(fig)
 
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture "Bode Plots"</div>
@@ -394,7 +397,7 @@ ax[1].yaxis.set_major_locator(MultipleLocator(90))
 # Another excellent question! This is where it gets a tad more difficult, but we'll soon look at some pictures too. First, we have a quick look at the closed loop transfer function again. Our 
 # block diagram with reference $r$, output error $e$, actuation $u$, output $y$, controller $C$, and process $G$ is 
 # 
-# ![](CLsys.svg)
+# ![](figures/CLsys.svg)
 # 
 # Then in the frequency domain the transfer from the reference to the output is $\frac{Y(s)}{R(s)}$. We get this by following the chain as 
 # $$Y(s) = G(s)U(s) = G(s)C(s)E(s) = L(s)E(s) = L(s)(R(s)-Y(s))$$
@@ -413,12 +416,7 @@ ax[1].yaxis.set_major_locator(MultipleLocator(90))
 
 # %%
 ## Create contour
-# Q = np.linspace(start=0, stop=1, num=150, endpoint=True)
-# R = 2
-# cntr = Gamma(Q, R)
-
-## Create contour
-Q = np.linspace(start=0, stop=2*np.pi, num=150, endpoint=True)
+Q = np.linspace(start=0, stop=2*np.pi, num=100, endpoint=True)
 R = 2
 cntr = R * np.exp(1j * Q)
 cntr[cntr.real < 0] = cntr[cntr.real < 0].imag * 1j
@@ -426,7 +424,7 @@ cntr[cntr.real < 0] = cntr[cntr.real < 0].imag * 1j
 fig1, ax = plt.subplots()
 drawContour(ax, cntr)
 
-plt.show()
+display(fig1)
 
 # %% [markdown]
 # That's a nice semicircle of finite radius! In the end we want to 'walk along the contour' to get its mapping. So we have our complex variable $s$ for our transfer functions and this we'll walk 
@@ -440,12 +438,11 @@ sc = ax.scatter([cntr[0].real], [cntr[0].imag], marker='x', color='red')
 ax.legend([r'$\Gamma$', r'$s$'])
 
 def animFun(t): 
-    sc.set_offsets([np.real(cntr[t]), np.imag(cntr[t])])
+    sc.set_offsets([cntr[t].real, cntr[t].imag])
     return sc, 
 anim = animation.FuncAnimation(fig1, func=animFun, frames=len(Q), interval=30, blit=True)
 
-plt.close(fig1)
-HTML(anim.to_jshtml())
+display(anim)
 
 # %% [markdown]
 # ### Shuffling $L(s)$
@@ -484,7 +481,7 @@ def anim_init(z1, ax):
     ## Animation time! Yeah don't focus too much on this it's fine
     r = cntr - z1
     rm = np.max(np.abs(r))
-    ax[1].set(aspect='equal', ylabel="Im", xlabel="Re", xlim=[-rm+np.real(z1), rm+np.real(z1)], ylim=[-rm+np.imag(z1),rm+np.imag(z1)])
+    ax[1].set(aspect='equal', xlabel="$\mathfrak{Re}\{G(s)\}$", ylabel="$\mathfrak{Im}\{G(s)\}$", xlim=[-rm+np.real(z1), rm+np.real(z1)], ylim=[-rm+np.imag(z1),rm+np.imag(z1)])
 
     arr = [None,None]
     for i in range(2):
@@ -497,11 +494,6 @@ def anim_init(z1, ax):
                     [np.imag(z1),np.imag(z1)+np.imag(rm/2*np.exp(1j*np.angle(r[0])))], 'k', lw=1.2, alpha=0.3)
     phArc = Arc((np.real(z1),np.imag(z1)), width=rm/2.3, height=rm/2.3, theta2=np.angle(r[0], deg=True))
     ax[1].add_patch(phArc)
-
-    # angr = np.angle(r)
-    # angr[angr<0] += 2*np.pi
-    # phlims = np.array([rm/3*np.exp(np.min(angr)*1j), 0j, rm/3*np.exp(np.max(angr)*1j)]) + z1
-    # phl3 = plt.plot(np.real(phlims), np.imag(phlims), 'b', lw=1.2, alpha=0.3)
     return arr, phArc, phl2, r, rm
 
 def animate(t):
@@ -512,9 +504,6 @@ def animate(t):
                     [np.imag(z1),np.imag(z1)+np.imag(rm/2*np.exp(1j*np.angle(r[t])))])
     return arr[0], arr[1], phArc, phl2[0]
 
-
-# %%
-
 fig2, ax = plt.subplots(1, 2)
 drawContour(ax[0], cntr)
 
@@ -524,8 +513,7 @@ z1 = 1.1*R*np.exp(9/7*np.pi*1j) # You can change me if you'd like
 arr, phArc, phl2, r, rm = anim_init(z1, ax)
 anim = animation.FuncAnimation(fig2, func=animate, frames=len(Q), interval=50, blit=True)
 
-plt.close(fig2)
-HTML(anim.to_jshtml())
+display(anim)
 
 
 # %% [markdown]
@@ -541,8 +529,7 @@ z1 = 0.8*R*np.exp(-2/7*np.pi*1j) # You can change me if you'd like
 arr, phArc, phl2, r, rm = anim_init(z1, ax)
 anim = animation.FuncAnimation(fig3, func=animate, frames=len(Q), interval=50, blit=True)
 
-plt.close(fig3)
-HTML(anim.to_jshtml())
+display(anim)
 
 # %% [markdown]
 # *Wait...* was that a circle? Actually, that makes sense right? $\Gamma$ goes around $z_1$, so then it has to make a full circle. Woah okay, so $(s-z_1)$ makes a full rotation if 
@@ -598,10 +585,7 @@ L1_eval2 = L1(np.flip(-S))
 
 fig = plt.figure(num="Bode - Nyquist relation")
 gs = GridSpec(2,2, figure=fig)
-ax = []
-ax.append(fig.add_subplot(gs[:, 0]))
-ax.append(fig.add_subplot(gs[0, 1]))
-ax.append(fig.add_subplot(gs[1, 1]))
+ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
 
 ax[0].set(title="Nyquist plot", 
           xlabel="$\mathfrak{Re}\{G(s)\}$", ylabel="$\mathfrak{Im}\{G(s)\}$")
@@ -614,7 +598,7 @@ drawContour(ax[0], L1_eval2, c='k', ls='--')
 ax[0].plot([-1], [0], 'xr')
 ax[1].loglog(OM, np.abs(L1_eval1), 'k')
 ax[2].semilogx(OM, unwrap_angle(np.angle(L1_eval1, deg=True)), 'k')
-display(fig.canvas)
+display(fig)
 
 # %% [markdown]
 # Now **this**, this is something we can animate🌈
@@ -658,12 +642,10 @@ def animate(t):
 
 anim = animation.FuncAnimation(fig, func=animate, frames=50, interval=150, blit=True)
 
-plt.close(fig)
-HTML(anim.to_jshtml())
-# fig
+display(anim)
 
 # %% [markdown]
-# ## Stability Margins
+# ## Performance Margins
 # As established in block A: *our model always sucks*. Therefore, we might want to know how prone our controller is to destabilizing the system, because our model is wrong. There are three popular measures for 
 # this: the gain margin, the phase margin, and the stability margin. They're quite easy:
 # - Gain margin $g$: $\argmin_{g}$ such that $g L(s)$ becomes unstable,
@@ -672,6 +654,7 @@ HTML(anim.to_jshtml())
 # 
 # You can read the gain and phase margins from a bode plot, but not the stability margin. In this sense a Nyquist plot contains more information than a Bode plot. Anyways, lets plot those margins for the previous 
 # loop function.
+
 # %%
 OM = np.logspace(-2, 4.5, 700)
 S = OM*1j
@@ -686,10 +669,7 @@ L1ph_eval1 %= 360
 
 fig = plt.figure(num="Bode - Nyquist relation")
 gs = GridSpec(2,2, figure=fig)
-ax = []
-ax.append(fig.add_subplot(gs[:, 0]))
-ax.append(fig.add_subplot(gs[0, 1]))
-ax.append(fig.add_subplot(gs[1, 1]))
+ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
 
 ax[0].set(title="Nyquist plot", aspect='equal',
           xlabel=r"$\mathfrak{Re}\{L(\Gamma_s)\}$", ylabel=r"$\mathfrak{Im}\{L(\Gamma_s)\}$")
@@ -753,20 +733,257 @@ l3, = ax[0].plot([-1, L1_eval1[idx_s_m].real],
 ax[1].legend(handles=[l1,l2,l3])
 print(f"Stability margin = {s_m:1.2f}")
 
-
+display(fig, fig2)
 
 # %% [markdown]
 # 
 # ## Minimum Phase Systems
+# Bode has one last curve-ball for you lovely people, he has a relation named after him that couples the phase and gain of TFs for so-called "Minimum Phase Systems" (MPS). We'll look into that more in a bit, 
+# first Bode's relation. Be warned, it's not pretty at first sight:
 # 
+# TODO: I'm confused man, the stuff in the slides doesn't make sense to me...
 # 
+# Very briefly, a system is minimum phase iff:
+# - There are no RHP zeros *and*
+# - There are no time delays.
+
+# %% [markdown]
+# ### My Bode's Relation confusion
+# The relation is defined in the slides (of '24/'25) as
+# $$ \angle G(i\Omega) = \frac{1}{\pi}\int_{-\infty}^{\infty}\frac{\text{d}\log|G(i\omega)|}{\text{d}\log(\omega)}\;\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|
+# \frac{\text{d}\omega}{\omega}.$$
+# Now my issue is that the integral is from $-\infty$ onwards, but that $\log(x)$ is not defined for $x\leq0$, and there are many logarithms. Investigating 
+# the three factors one by one:
+# 
+# $\frac{\text{d}\log|G(i\omega)|}{\text{d}\log(\omega)}$ is a derivative. As we've seen before, this is just the slope of the log-log graph for positive frequencies and for negative
+# frequencies it's the same but negative. I do have some issues with the notation of the denominator though.
+# 
+# $\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|$ is a bit weirder, but logarithms of an absolute value, so we're good for negative values. Let's do some simplifications
+# $$ \log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| = \log\frac{|\omega+\Omega|}{|\omega-\Omega|} = \log|\omega+\Omega| - \log|\omega-\Omega|.$$
+# Okay, so the function is not defined for $\omega = \Omega$.
+# 
+# Lastly, there is $\frac{1}{\omega}$, causing problems when $\omega=0$.
+# 
+# ### So do better then
+# Yeah, I'll try. I'm at my parents at the moment and don't have my books, so we'll all have to make do with wikipedia.
+# 
+# In [this paragraph](https://en.wikipedia.org/wiki/Minimum_phase#Relationship_of_magnitude_response_to_phase_response), they define the relation through the Hilbert transform, 
+# $\mathcal{H}$. The relation is then
+# $$ \angle G(s) = -\mathcal{H}\{\log|G(s)|\}, $$ 
+# with the inverse 
+# $$ \log|G(s)| = \log|G(i\infty)| + \mathcal{H}\{\angle G(s)\} .$$
+# Here, the Hilbert transform is defined in time-domain as 
+# $$ \mathcal{H}\{x(t)\} =  \frac{1}{\pi}\int_{-\infty}^{\infty} \frac{x(\tau)}{t-\tau}\text{d}\tau$$
+# [This page](https://en.wikipedia.org/wiki/Hilbert_transform#Relationship_with_the_Fourier_transform) also exists. Also see page 172 of Skogestad. This is a bigger time investment than I expected.
+# 
+# I give up (for now)
 
 
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture "Frequency Domain Analysis"</div>
 
 # %% [markdown]
+# # PID control
+# **So I'm switching around this lecture and the next, because that makes more sense to me. I'll cover this one after the next.** I believe the course would benefit from a bigger contrast between system analysis 
+# and controller synthesis. 
 # <div style="text-align:center;background-color:tomato;">End of lecture "PID control"</div>
+
+# %% [markdown]
+# # You will love the frequency domain after this, I promise
+# Looking back at the general controller architecture:
+# ![General feedback loop](figures/CLsys_general.svg)
+# 
+# Then the complete transfer function collection is
+# $$ \begin{bmatrix} y \\ \eta \\ v \\ u \\ e \end{bmatrix} = \frac{1}{1+PC}
+# \begin{bmatrix} 
+# PCF   & P     & 1     \\
+# PCF   & P     & -PC   \\
+# CF    & 1     & -C    \\
+# CF    & -PC   & -C    \\
+# F     & -P    & -1    
+# \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} \triangleq
+# \begin{bmatrix} 
+# TF   & PS     & S     \\
+# TF   & PS     & -T   \\
+# CFS  & S      & -CS    \\
+# CFS  & -T     & -CS    \\
+# FS   & -PS    & -S    
+# \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} ,$$
+# where $S=\frac{1}{1+PC}=\frac{1}{1+L}$ is called the sensitivity function and $T=\frac{PC}{1+PC}=\frac{L}{1+L}=SL$ is called the complementary sensitivity function. They're called complements because
+# $$ S + T = \frac{1}{1+PC} + \frac{PC}{1+PC} = I.$$
+# 
+# ## What about the performance?
+# Fun fact: you can derive the effectiveness of feedback control from that transfer matrix. Looking at the last row which represents the transfers from the reference and disturbances
+# to the tracking error, $e$. The smaller this error, the better the feedback control is performing. Now also note that every element in this last row is right multiplied with $S$, meaning that smaller magnitudes
+# of $S$ result in smaller tracking errors. So
+# - $|S(s)| < 1 \rightarrow $ disturbances are attenuated/rejected (this is good),
+# - $|S(s)| = 1 \rightarrow $ equivalent to open loop control (meh),
+# - $|S(s)| > 1 \rightarrow $ disturbances are amplified (this is bad).
+# 
+# We've looked at controller performance before with the gain, phase, and stability margins. Of course these are still valid and we'll build further on this. Just to reframe that theory, we have to define
+# the cross-over frequencies $\omega_\text{gc}\leftarrow|L(\omega_\text{gc})|=1$ and $\omega_\text{pc}\leftarrow\angle L(\omega_\text{pc})=\pm 180^\circ$ for the gain and phase cross-overs (you know $L=PC$).
+# Then the gain margin GM $=1/|L(\omega_\text{pc})|$ and phase margin PM $=180^\circ - |\angle L(\omega_\text{gc})|$.
+# 
+# With our new theory we can also define the closed loop bandwidth, $\omega_\text{B}$, of our controlled system! This is a measure of until what frequency we can reject disturbances and it's defined as the 
+# frequency where $|T(s)|$ first crosses $\frac{1}{\sqrt2}\approx0.707\approx -3$ dB from above. Good, we have the frequencies of interest for the gain and phase margins.
+# 
+# Now for the stability margin, $s_m$, that we defined earlier as the minimal distance between $L(s)$ and the point -1. Equivalently, this is the minimum of $|1 + L(s)|$, which coincidentally is the denominator of $S$. 
+# Therefore the stability margin occurs when the sensitivity function magnitude is the largest. Utilising that property, we define
+# $$ M_S = \max |S(s)| = \frac{1}{s_m} .$$
+# Now we have to perform some geometry magic, but to explain that we need an exampe Nyquist plot
+
+# %%
+L2 = lambda s :  1.2 / (s+.7)**3
+
+OM = np.logspace(-2, 2, 700)
+S = OM*1j
+
+L2_eval1 = L2(S)
+L2_eval2 = L2(np.flip(-S))
+
+L2mag_eval1 = np.abs(L2_eval1)
+L2ph_eval1 = unwrap_angle(np.angle(L2_eval1, deg=True))
+L2ph_eval1 %= 360
+
+fig, ax = plt.subplots(num="Performance")
+
+drawContour(ax, L2_eval1, c='k', ls='-')
+drawContour(ax, L2_eval2, c='k', ls='--')
+
+ax.set(title="Nyquist plot", aspect='equal',
+          xlabel=r"$\mathfrak{Re}\{L(\Gamma_s)\}$", ylabel=r"$\mathfrak{Im}\{L(\Gamma_s)\}$")
+
+## Determine gain margin
+idx_g_m = np.abs((L2ph_eval1 - 180.)).argmin()
+g_m = 1/L2mag_eval1[idx_g_m]
+l1, = ax.plot([0, -L2mag_eval1[idx_g_m]], [0,0], c='C0', ls=':', label="1/GM")
+
+print(f"Gain margin = {g_m:1.2f}")
+
+## Determine phase margin
+idx_phi_m_candidates = [idx for idx in range(L2mag_eval1.size - 1) if (L2mag_eval1[idx]-1) * (L2mag_eval1[idx+1]-1) < 0. 
+                        and abs(L2ph_eval1[idx]) >= 90. ]
+idx_phi_m = idx_phi_m_candidates[0]
+phi_m = np.abs(180 + L2ph_eval1[idx_phi_m])
+a = L2mag_eval1[idx_phi_m] * np.exp(np.linspace(0, np.asin(np.sin(phi_m * np.pi / 180.)))*1j)
+l2, = ax.plot(-a.real, abs(a.imag), c='C1', ls=':', label="PM")
+print(f"Phase margin = {np.asin(np.sin(phi_m * np.pi / 180.)) * 180. / np.pi:1.2f} degrees")
+
+## Determine stability margin
+idx_s_m = np.abs(L2_eval1 + 1).argmin()
+s_m = np.abs(L2_eval1 + 1).min()
+l3, = ax.plot([-1, L2_eval1[idx_s_m].real],
+           [0, abs(L2_eval1[idx_s_m].imag)],
+           'g-.', label="Stability Margin")
+SMcirc = s_m * np.exp(np.linspace(0,2*np.pi) * 1j)
+ax.plot(SMcirc.real - 1, SMcirc.imag,
+           'g-.', label="Stability Margin")
+
+ax.legend(handles=[l1,l2,l3])
+print(f"Stability margin = {s_m:1.2f}")
+
+display(fig)
+
+# %% [markdown]
+# So lets have a gander at what this plot tells us, starting with the gain margin. We can say for sure that the Nyquist plot on the real axis is *at least* as far away as $s_m$, 
+# otherwise that would be the stability margin. So we have $s_m \leq 1 - \frac{1}{\text{GM}}$ from that statement, and some rewriting gives
+# $$ s_m \leq 1 - \frac{1}{\text{GM}} \rightarrow 1 - s_m \geq \frac{1}{\text{GM}} \rightarrow \text{GM} \geq \frac{1}{1 - s_m} .$$
+# Coupling back to $M_S$:
+# $$ \frac{1}{1 - s_m} = \frac{M_S}{M_S - 1} \leq \text{GM}.$$
+# 
+# Now the phase margin is a tad more annoying, because it actually involves triangles and we need some extra lines. (Stolen from: Skogestad p.35)
+# 
+# 
+
+# %%
+PM = L2_eval1[idx_phi_m].real + abs(L2_eval1[idx_phi_m].imag) * 1j
+SM = L2_eval1[idx_s_m].real + abs(L2_eval1[idx_s_m].imag) * 1j
+
+# Redraw figure and zoom to relevant part
+fig, ax = plt.subplots(num="Performance - Phase Margin bounds")
+
+ax.set(title="Nyquist plot", aspect='equal',
+          xlabel=r"$\mathfrak{Re}\{L(\Gamma_s)\}$", ylabel=r"$\mathfrak{Im}\{L(\Gamma_s)\}$")
+
+ax.plot(L2_eval1.real, L2_eval1.imag, c='k', ls='-', alpha=.4)
+ax.plot(L2_eval2.real, L2_eval2.imag, c='k', ls='--', alpha=.4)
+ax.plot(-a.real/abs(a), abs(a.imag)/abs(a), c='C1', ls=':', label="PM")
+ax.plot([-1, SM.real],
+        [0, SM.imag],
+        'g-.', label="Stability Margin")
+SMcirc = s_m * np.exp(np.linspace(0,2*np.pi) * 1j)
+ax.plot(SMcirc.real - 1, SMcirc.imag,
+           'g-.', label="Stability Margin")
+ax.set(xlim=[-1 - s_m*1.2, .1], ylim=[-.1, PM.imag+.1])
+
+# Draw construction lines and points
+ax.plot([0, -1, PM.real, 0, (PM.real - 1) /2],
+        [0,  0, PM.imag, 0, (PM.imag    ) /2],
+        'k')
+l = [ax.plot([p.real], [p.imag], 'o', label=n)[0] for p, n in zip([PM, (PM - 1)/2], ['$P$', '$Q$'])]
+ax.legend(handles=l)
+display(fig)
+
+# %% [markdown]
+# What does this triangle whisper in the night? Well first of all that $P = L(i\omega_\text{gc})$ and $Q = \frac12(P - 1)$, and per definition $\angle (-1,0,P) = $ PM. From similarity you 
+# also get the bisection property $\angle (-1,0,Q) = \frac12$ PM and note that $\angle (P,Q,0)$ is a right angle. Then, the length of $(-1, P)$ is 
+# $$|P+1|=|L(i\omega_\text{gc})+1|=\frac{1}{|S(i\omega_\text{gc})|}=2\sin(\frac12\text{PM}) \rightarrow |S(i\omega_\text{gc})| = \frac{1}{2\sin(\frac12\text{PM})}$$
+# Now as a last step, per definition of the stability margin $|P+1|\geq s_m$. Therefore, $2\sin(\frac12\text{PM}) \geq s_m$ and $M_S \leq 
+# \frac{1}{2\sin(\frac12\text{PM})}$. Isolating PM gives
+# $$PM \geq 2\arcsin(\frac{1}{2 M_S}).$$
+# DONE. Now if we get $M_S=2$, we are guaranteed to have a gain margin more than 2 and a phase margin more than $29^\circ$, guaranteeing good performance.
+# 
+# # Loop Shaping
+# We've done a lot of system analysis up to now, but it is time for some controller synthesis! To design a controller, one can do something called loop shaping. To be honest, this is easier said than done, but 
+# we already have the theory. Firstly, we determine the natural crossover frequency $\omega_\text{gc}$ from $L\mid_{C=1}$. Then we say we have three regions: low frequencies, the crossover region around 
+# $\omega_\text{gc}$, and high frequencies. Now the trick is to add poles and zeros (pairs) to $C$, such that
+# 
+# | Frequencies | $C(s)$  | $\mid S(s)\mid$ |
+# | --------    | ------- | --------        |
+# | Low         | -       | Low gain ensures disturbance rejection            |
+# | Cross-over  | Ensure good GM and PM     | Ensure good SM             |
+# | High        | Low gain ensures measurement noise rejection      | -            |
+# 
+# ## Easier said...
+# So lets run an example and you'll understand better (I hope). We start with a unitary feedback controller and see how we're doing and what plant we have.
+# 
+# %%
+%matplotlib notebook
+import numpy as np
+import matplotlib.pyplot as plt
+plt.rcParams.update({ 'mathtext.fontset':         'cm',
+                      'font.size':          12.0,               'axes.labelsize':           'medium',
+                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
+                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
+                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
+                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
+                      'animation.html':     'jshtml'
+                    })
+
+from matplotlib.ticker import MultipleLocator
+from matplotlib.gridspec import GridSpec
+import matplotlib.animation as animation
+from IPython.display import display, Markdown
+
+import warnings
+warnings.filterwarnings("ignore")
+
+import control as cm
+from helperFunctions import *
+
+###############################################
+SYS = loopShaper()
+fig = plt.figure(figsize=[15, 6])
+gs = GridSpec(3,2, figure=fig)
+ax = [fig.add_subplot(a) for a in [gs[0,0], gs[1, 0], gs[2, 0], gs[:, 1]]]
+
+SYS.plot_LS(ax)
+display(fig)
+
+
+# %% [markdown]
+# # Fundamental Limitations
+# I'm so sorry, but everything we've done is technically speaking bachelor level control engineering. Now that we're nearing the end of the course content, we run into problems that we ignored before.
 
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture "Frequency Domain Design I & II"</div>
