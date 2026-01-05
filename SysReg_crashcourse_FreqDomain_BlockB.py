@@ -940,12 +940,16 @@ display(fig)
 # 
 # | Frequencies | $C(s)$  | $\mid S(s)\mid$ |
 # | --------    | ------- | --------        |
-# | Low         | -       | Low gain ensures disturbance rejection            |
+# | Low         | High gain ensures unscaled tracking       | Low gain ensures disturbance rejection            |
 # | Cross-over  | Ensure good GM and PM     | Ensure good SM             |
 # | High        | Low gain ensures measurement noise rejection      | -            |
 # 
+# That unscaled tracking cell confused me slightly, so briefly why: the transfer function $G_{yr} = TF = \frac{L}{1+L}F$. Ignoring $F$ for a second, $\lim_{|L|\rightarrow\infty}\frac{L}{1+L} = 1$, meaning there 
+# is unitary gain for constant input, i.e. unscaled reference tracking.
+# 
 # ## Easier said...
-# So lets run an example and you'll understand better (I hope). We start with a unitary feedback controller and see how we're doing and what plant we have.
+# So lets run an example and you'll understand better (I hope). This will be very much a Plato-style of explanation (coincidentally my favourite style). We start with a unitary 
+# feedback controller and see what plant we're dealing with.
 # 
 # %%
 %matplotlib notebook
@@ -973,18 +977,99 @@ from helperFunctions import *
 
 ###############################################
 SYS = loopShaper()
-fig = plt.figure(figsize=[15, 6])
-gs = GridSpec(3,2, figure=fig)
-ax = [fig.add_subplot(a) for a in [gs[0,0], gs[1, 0], gs[2, 0], gs[:, 1]]]
+fig = plt.figure(figsize=[15, 8])
+gs = GridSpec(4,2, figure=fig)
+ax = [fig.add_subplot(a) for a in [gs[0,0], gs[1, 0], gs[2, 0], gs[:3, 1], gs[3,:]]]
 
 SYS.plot_LS(ax)
 display(fig)
 
+# %% [markdown]
+# What should you get from this plot? Well, lets start with the crossover frequencies: they're around 30 or 300 rad/s. The loop transfers below and above have a low gain. Our margins are looking good however 
+# and we can gain some performance for sure. Lets work low to high frequencies. For the lower frequencies our sensitivity needs low gains, so our loop needs high gains, also ensuring good tracking. 
+# It doesn't, so lets add an integrator:
+
+# %%
+SYS.Cpoles = [0]
+SYS.OM = np.logspace(-5, 5, 1000)
+
+[a.cla() for a in ax]
+SYS.plot_LS(ax)
+display(fig)
+
+# %% [markdown]
+# We need a bit more downslope around 1E-3 rad/s, i.e. more poles:
+
+# %%
+SYS.Cpoles = [0, -1e-3]
+
+[a.cla() for a in ax]
+SYS.plot_LS(ax)
+display(fig)
+
+# %% [markdown]
+# Okaayyy, lower frequencies looking good. Zooming in on the crossover frequency next:
+
+# %%
+[a.set_xlim([1e-2, 1e2]) for a in ax[:3]]
+ax[0].set_ylim([1e-3, 5e1])
+display(fig)
+
+# %% [markdown]
+# Notes: our PM is very large, as well as our GM. In this case we can decrease both of these with the gain. Lets aim for $35^\circ$ PM, looking at the phase plot that happens at 50 or so rad/s, the 
+# magnitude there now is $5E-4$. *Therefore*, our gain can be $2E3$:
+
+# %%
+SYS.Cgain = 2e2
+
+[a.cla() for a in ax]
+SYS.plot_LS(ax)
+display(fig, np.pi/3)
+
+# %% [markdown]
+# Honestly I suck at loop shaping.
+# 
+# ## Feedforward control
+# We've been ignoring the feedforward block up to now, but really it's very powerful when you can measure the output noise. 
+# Consider when there's no input noise $d$, which is often the case, and we add an extra feedforward control $u_\text{ff}$ 
+# such that $u = Ce + u_\text{ff}$. Now append/recall $y = TFr + PSu_\text{ff} + Sn$
+# Then with the measurement of the output noise $n$, define $u_\text{ff} = P^{-1}Fr - P^{-1}n$
+# $$ y = (1- S)Fr + PSu_\text{ff} + Sn  = Fr - SFr + PS(P^{-1}Fr - P^{-1}) + Sn = Fr - SFr + PSP^{-1}Fr - PSP^{-1}n + Sn $$
+# $$ = Fr - SFr + SFr - Sn + Sn = Fr.$$
+# This means you have perfect tracking. However, inverting the plant might not always be possible (non minimum phase systems for example). 
+# There are more tricks like this when you have knowledge of your disturbances.
 
 # %% [markdown]
 # # Fundamental Limitations
-# I'm so sorry, but everything we've done is technically speaking bachelor level control engineering. Now that we're nearing the end of the course content, we run into problems that we ignored before.
+# ## Waterbed effect
+# The funny thing about control is, the most important proofs are the proofs that say that something 
+# is **impossible**. These are the bounds you cannot circumvent. Bode's integral formula, otherwise known as the waterbed effedct,
+#  is one of these. It is defined as: assume L has relative degree $geq$ 2 and $N_p$ RHP-poles $p_i$, then
+# $$ \int_0^\infty\log|S(i\omega)|\text{d}\omega = \pi\sum_{i=1}^{N_p} \mathfrak{Re}(p_i).$$
+# This is somewhat reminiscent of the Nyquist plot. This integral is basically the integral of the vector going from -1 to the Nyquist plot. 
+# Iff this integral makes a half ellips on the onesided Nyquist contour, there is an encirclement, there is a RHP-pole.
+# 
+# What it's also saying is: you can never change the value of that integral (assuming you don't add RHP poles). Therefore, if you change C 
+# to take some magnitude in S away, it has to come back at other frequencies.
+# 
+# ## Time delays
+# Time delays are annoying, because they put a hard limit on your bandwidth. Why? Well, a time delay $e^{-\theta s}$, has an idealized $T(s)=e^{-\theta s}$. 
+#  The bandwidth is defined as $|T(i\omega_\text{B})| = \frac{1}{\sqrt2}$. Also 
+# $$|S + T| = 1 \leq |S| + |T| \rightarrow |S(i\omega_\text{B})| + \frac{1}{\sqrt2} \geq 1 \rightarrow |S(i\omega_\text{B})|  \geq 1 - \frac12\sqrt2$$
+# $$ S = 1 - e^{-\theta s} = 1 - \cos(-\theta\omega) - i\sin(-\theta\omega) \rightarrow |S| = \sqrt{ (1 - \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2}$$
+# $$ |S| = 1 \rightarrow  (1 - \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2 = 1$$
+# $$ (1 - \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2 = 1 = 1 - 2\cos(-\theta\omega) + \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2 $$
+# $$ = 1 - 2\cos(-\theta\omega) + 1 = 1 \rightarrow 1 - 2\cos(-\theta\omega) = 0 \rightarrow \cos(-\theta\omega) = \frac12 \rightarrow -\theta\omega = 
+# \pm\frac13\pi \approx \pm 1 \rightarrow \omega \approx \frac{1}{\theta} $$
+
+# %%
+w = np.logspace(-2, 2, 800)
+fig = plt.figure()
+plt.loglog(w, np.abs(1 - np.exp(-1 * w * 1j)))
+plt.loglog(w, np.abs( np.exp(-1 * w * 1j)))
+display(fig)
 
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture "Frequency Domain Design I & II"</div>
-
+# # Closing remark
+# I'm so sorry, but everything we've done is, technically speaking, bachelor level control engineering.

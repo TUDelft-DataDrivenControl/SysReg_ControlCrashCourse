@@ -53,23 +53,21 @@ def unwrap_angle(ang):
 
 import matplotlib.pyplot as plt
 import numpy.random as rng
+import scipy as sp
+import control as cm
 from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import MultipleLocator
-from IPython.display import display
+from IPython.display import display, Markdown
 
 class loopShaper():
     def __init__(self, inputNoise=False, outputNoise=False):
         self.Czeros = []
         self.Cpoles = []
         self.Cgain = 1.
-        # self.Pzeros = [1., self.gen_pair(1e-3, 1.5)]
-        # self.Ppoles = [1e2, self.gen_pair(1e-1, .2), self.gen_pair(5e2, 3)]
-        self.Pzeros = [self.gen_pair(-1e-2, 1.5)]
-        self.Ppoles = [-1e2, self.gen_pair(-1e-1, .2)]
-        self.Pgain = 1e3
-        self.omRange = [-4, 4]
-        self.OM = np.logspace(self.omRange[0], self.omRange[1], 500)
-        self.S = self.OM*1j
+        self.Pzeros = [-1., self.gen_pair(1e-3, 1.5)]
+        self.Ppoles = [-1e2, self.gen_pair(1e-1, .2), self.gen_pair(5e2, 3)]
+        self.Pgain = 1e6
+        self.OM = np.logspace(-4, 4, 500)
     
     def gen_pair(self, om0, zeta):
         q1 = -zeta*om0
@@ -79,11 +77,13 @@ class loopShaper():
     def get_response(self, Z, P, K):
         response = np.ones_like(self.S) * K
         for z in Z:
+            if z == []: continue
             if type(z) == tuple: # zero pair
                 response *= (self.S - z[0]) * (self.S - z[1])
             else:
                 response *= (self.S - z)
         for p in P:
+            if p == []: continue
             if type(p) == tuple: # pole pair
                 response /= (self.S - p[0]) 
                 response /= (self.S - p[1])
@@ -91,17 +91,49 @@ class loopShaper():
                 response /= (self.S - p)
         return response
 
+    def get_CLsteadygain(self):
+        Lzeros, Lpoles = self.Pzeros + self.Czeros, self.Ppoles + self.Cpoles
+        Lgain = self.Pgain * self.Cgain
+
+        NL, DL, = 1, 1
+        for z in Lzeros:
+            if z == []: continue
+            if type(z) == tuple: # zero pair
+                NL *= ( - z[0]) * ( - z[1])
+            else:
+                NL *= ( - z)
+        for p in Lpoles:
+            if p == []: continue
+            if type(p) == tuple: # pole pair
+                DL *= ( - p[0]) * ( - p[1])
+            else:
+                DL *= ( - p)
+
+        return np.abs(Lgain * NL / (DL + Lgain*NL))
+    
+    def unpack(self, Q):
+        out = []
+        for q in Q:
+            if q == []: continue
+            if type(q) == tuple: # pair
+                out.append(q[0])
+                out.append(q[1])
+            else:
+                out.append(q)
+        return out
+
     
     def plot_LS(self, ax):
-        [a.set_title(b) for a, b in zip([ax[-1], ax[0]], ["Nyquist plot", "Bode plots"])]
-        [a.set_ylabel(b) for a, b in zip(ax[:3], ["$|L(s)|$", r"$\angle L(s)$", "$|S(s)|$" ])]
+        [a.set_title(b) for a, b in zip([ax[3], ax[0], ax[4]], ["Nyquist plot", "Bode plots", "Step Response"])]
+        [a.set_ylabel(b) for a, b in zip([ax[0], ax[1], ax[2], ax[4]],
+                                         ["$|L(s)|$", r"$\angle L(s)$", "$|S(s)|$" , "$y(t)$" ])]
         ax[1].yaxis.set_major_locator(MultipleLocator(90))
         ax[2].set_xlabel(r"$\omega$")
-        ax[-1].set(aspect='equal',
+        ax[4].set_xlabel(r"$t$")
+        ax[3].set(aspect='equal',
                     xlabel=r"$\mathfrak{Re}\{L(\Gamma_s)\}$", ylabel=r"$\mathfrak{Im}\{L(\Gamma_s)\}$",
                     xlim=[-2,1], ylim=[-2, 2])
         
-        self.OM = np.logspace(self.omRange[0], self.omRange[1], 500)
         self.S = self.OM*1j
 
         Presponse = self.get_response(self.Pzeros, self.Ppoles, self.Pgain)
@@ -121,14 +153,33 @@ class loopShaper():
         ax[1].legend(handles=[llM, lpM, lcM])
         [a.autoscale(enable=True, axis='x', tight=True) for a in ax[:3]]
 
+
         # Plot sensitivity
         ax[2].loglog(self.OM, np.abs(1. / (1. + Lresponse)), 'k')
+
+        [a.axhline(1, color='r', lw=.7) for a in [ax[0], ax[2]]]
 
         # Plots Nyquist
         ax[3].plot(Lresponse.real, Lresponse.imag, 'k')
         ax[3].plot(Lresponse.real, -Lresponse.imag, 'k--')
 
-        UnitCirc = np.exp(np.linspace(0,2*np.pi,100))
+        UnitCirc = np.exp(np.linspace(0,2*np.pi,100)*1j)
         ax[3].plot(UnitCirc.real, UnitCirc.imag, 'k:')
         ax[3].plot([-1], [0], 'rx')
+
+        # Plot step response
+        P = cm.zpk(self.unpack(self.Pzeros), self.unpack(self.Ppoles), self.Pgain)
+        C = cm.zpk(self.unpack(self.Czeros), self.unpack(self.Cpoles), self.Cgain)
+        L = cm.series(C, P)
+        T = cm.feedback(L)
+        t, yout = cm.step_response(L)
+        ax[4].plot(t, yout, 'k')
+        ax[4].autoscale(enable=True, axis='x', tight=True)
+        
+        # Plot steady response
+        Tss = self.get_CLsteadygain()
+        ax[4].axhline(Tss, color='k', ls=':')
+
+        print(f"Steady gain is {Tss:.3E}")
+        display(Markdown(f"$M_S = {np.abs(1. / (1. + Lresponse)).max():.3f}$"))
 
