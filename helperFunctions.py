@@ -172,7 +172,7 @@ class loopShaper():
         C = cm.zpk(self.unpack(self.Czeros), self.unpack(self.Cpoles), self.Cgain)
         L = cm.series(C, P)
         T = cm.feedback(L)
-        t, yout = cm.step_response(L)
+        t, yout = cm.step_response(T)
         ax[4].plot(t, yout, 'k')
         ax[4].autoscale(enable=True, axis='x', tight=True)
         
