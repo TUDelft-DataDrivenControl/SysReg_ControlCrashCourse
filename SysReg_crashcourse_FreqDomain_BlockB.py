@@ -810,7 +810,7 @@ display(fig, fig2)
 # FS   & -PS    & -S    
 # \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} ,$$
 # where $S=\frac{1}{1+PC}=\frac{1}{1+L}$ is called the sensitivity function and $T=\frac{PC}{1+PC}=\frac{L}{1+L}=SL$ is called the complementary sensitivity function. They're called complements because
-# $$ S + T = \frac{1}{1+PC} + \frac{PC}{1+PC} = I.$$
+# $$ S + T = \frac{1}{1+PC} + \frac{PC}{1+PC} = 1.$$
 # 
 # ## What about the performance?
 # Fun fact: you can derive the effectiveness of feedback control from that transfer matrix. Looking at the last row which represents the transfers from the reference and disturbances
@@ -821,7 +821,7 @@ display(fig, fig2)
 # - $|S(s)| > 1 \rightarrow $ disturbances are amplified (this is bad).
 # 
 # We've looked at controller performance before with the gain, phase, and stability margins. Of course these are still valid and we'll build further on this. Just to reframe that theory, we have to define
-# the cross-over frequencies $\omega_\text{gc}\leftarrow|L(\omega_\text{gc})|=1$ and $\omega_\text{pc}\leftarrow\angle L(\omega_\text{pc})=\pm 180^\circ$ for the gain and phase cross-overs (you know $L=PC$).
+# the cross-over frequencies $\omega_\text{gc}\leftarrow|L(\omega_\text{gc})|=1$ and $\omega_\text{pc}\leftarrow\angle L(\omega_\text{pc})=\pm 180^\circ$ for the gain and phase cross-overs.
 # Then the gain margin GM $=1/|L(\omega_\text{pc})|$ and phase margin PM $=180^\circ - |\angle L(\omega_\text{gc})|$.
 # 
 # With our new theory we can also define the closed loop bandwidth, $\omega_\text{B}$, of our controlled system! This is a measure of until what frequency we can reject disturbances and it's defined as the 
@@ -948,34 +948,10 @@ display(fig)
 # is unitary gain for constant input, i.e. unscaled reference tracking.
 # 
 # ## Easier said...
-# So lets run an example and you'll understand better (I hope). This will be very much a Plato-style of explanation (coincidentally my favourite style). We start with a unitary 
+# So lets run an example and you'll understand better (I hope). We start with a unitary 
 # feedback controller and see what plant we're dealing with.
 # 
 # %%
-%matplotlib notebook
-import numpy as np
-import matplotlib.pyplot as plt
-plt.rcParams.update({ 'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'
-                    })
-
-from matplotlib.ticker import MultipleLocator
-from matplotlib.gridspec import GridSpec
-import matplotlib.animation as animation
-from IPython.display import display, Markdown
-
-import warnings
-warnings.filterwarnings("ignore")
-
-import control as cm
-from helperFunctions import *
-
-###############################################
 SYS = loopShaper()
 fig = plt.figure(figsize=[15, 8])
 gs = GridSpec(4,2, figure=fig)
@@ -1012,22 +988,33 @@ display(fig)
 
 # %%
 [a.set_xlim([1e-2, 1e2]) for a in ax[:3]]
-ax[0].set_ylim([1e-3, 5e1])
+ax[0].set_ylim([1e-4, 5e1])
 display(fig)
 
 # %% [markdown]
-# Notes: our PM is very large, as well as our GM. In this case we can decrease both of these with the gain. Lets aim for $35^\circ$ PM, looking at the phase plot that happens at 50 or so rad/s, the 
+# Notes: our PM is not super big, GM is massive however. In this case we can fix both of these with the gain. Lets aim for $35^\circ$ PM, looking at the phase plot that happens at 50 or so rad/s, the 
 # magnitude there now is $5E-4$. *Therefore*, our gain can be $2E3$:
 
 # %%
-SYS.Cgain = 2e2
+SYS.Cgain = 2e3
 
 [a.cla() for a in ax]
 SYS.plot_LS(ax)
-display(fig, np.pi/3)
+display(fig)
 
 # %% [markdown]
-# Honestly I suck at loop shaping.
+# That's a bit too much overshoot to my liking, and our stability margin is a little too small: so let's pull back a little on that gain to increase the PM (generally reduces overshoot (not always)) and 
+# increase the stability margin.
+
+# %%
+SYS.Cgain = 1.25e3
+
+[a.cla() for a in ax]
+SYS.plot_LS(ax)
+display(fig)
+
+# %% [markdown]
+# Now that's a nice looking controller!
 # 
 # ## Feedforward control
 # We've been ignoring the feedforward block up to now, but really it's very powerful when you can measure the output noise. 
@@ -1053,23 +1040,39 @@ display(fig, np.pi/3)
 # to take some magnitude in S away, it has to come back at other frequencies.
 # 
 # ## Time delays
-# Time delays are annoying, because they put a hard limit on your bandwidth. Why? Well, a time delay $e^{-\theta s}$, has an idealized $T(s)=e^{-\theta s}$. 
-#  The bandwidth is defined as $|T(i\omega_\text{B})| = \frac{1}{\sqrt2}$. Also 
-# $$|S + T| = 1 \leq |S| + |T| \rightarrow |S(i\omega_\text{B})| + \frac{1}{\sqrt2} \geq 1 \rightarrow |S(i\omega_\text{B})|  \geq 1 - \frac12\sqrt2$$
-# $$ S = 1 - e^{-\theta s} = 1 - \cos(-\theta\omega) - i\sin(-\theta\omega) \rightarrow |S| = \sqrt{ (1 - \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2}$$
-# $$ |S| = 1 \rightarrow  (1 - \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2 = 1$$
-# $$ (1 - \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2 = 1 = 1 - 2\cos(-\theta\omega) + \cos(-\theta\omega)^2 +  \sin(-\theta\omega)^2 $$
-# $$ = 1 - 2\cos(-\theta\omega) + 1 = 1 \rightarrow 1 - 2\cos(-\theta\omega) = 0 \rightarrow \cos(-\theta\omega) = \frac12 \rightarrow -\theta\omega = 
-# \pm\frac13\pi \approx \pm 1 \rightarrow \omega \approx \frac{1}{\theta} $$
-
+# Time delays are annoying, because they put a hard limit on your bandwidth. Why? Well, I really tried to explain it nicely, but to be honest it's just hard. 
+# Therefore I'm going for the most boring option and I'm going to paraphrase Skogestad Ch. 5.5 and 5.6. Reading that is honestly better.
+# 
+# For any plant with a time delay $\theta \rightarrow e^{-\theta s}$, the perfect controller can be at most as fast as the time delay. After all, the perfect control will only affect
+# the output after the time delay. Therefore, an absolute perfect control is limited to a complementary sensitivity function of 
+# $T(s)=e^{-\theta s}$. The ideal sensitivity function is therefore $S(s) = 1 - T(s)$. Then a lot of maths,
+# $$ S = 1 - e^{-\theta s} = 1 - \cos(-\theta\omega) - i\sin(-\theta\omega) \rightarrow |S| = \sqrt{ (1 - \cos(-\theta\omega))^2 +  \sin(-\theta\omega)^2}$$
+# $$ |S(i\Omega)| = 1 \rightarrow  (1 - \cos(-\theta\Omega))^2 +  \sin(-\theta\Omega)^2 = 1$$
+# $$  = 1 - 2\cos(-\theta\Omega) + \cos(-\theta\Omega)^2 +  \sin(-\theta\Omega)^2  = 1 - 2\cos(-\theta\Omega) + 1 = 1 \rightarrow 1 - 2\cos(-\theta\Omega) = 0 $$
+# $$ \rightarrow \cos(-\theta\Omega) = \frac12 \rightarrow -\theta\Omega = 
+# \pm\frac13\pi \approx \pm 1 \rightarrow \Omega \approx \frac{1}{\theta} $$
+# Also we need to realise what the perfect sensitivity function is: $|S| = |L^{-1}T|$ (I would love to be able to explain why). As we saw above: $|T|=1$, so 
+# $|S| = \frac{1}{|L|}$. That means that $|S(i\Omega)| = 1 \rightarrow |L(i\Omega)| = 1$ and therefore $\Omega$ is the crossover frequency. 
+# Now your controller will never be absolutely perfect, because we live in the real world. So your crossover frequency will be lower than this value, making 
+# it an upper bound on your crossover frequency and controller speed. Now the slides say delays give a limit on your bandwidth and I'm not sure why.
+# ## RHP zeros
+# Read Skogestad 5.6, I'm sorry.
+# 
+# Now just to show *something*, here's $S = 1 - e^{-\theta s},\;\theta=5$
 # %%
-w = np.logspace(-2, 2, 800)
+w = np.logspace(-2, 1, 800)
 fig = plt.figure()
-plt.loglog(w, np.abs(1 - np.exp(-1 * w * 1j)))
-plt.loglog(w, np.abs( np.exp(-1 * w * 1j)))
+plt.loglog(w, np.abs(1 - np.exp(-5 * w * 1j)))
+plt.gca().axvline(1/5., color='k', ls='--')
+plt.gca().axhline(1., color='k', ls='--')
+plt.gca().set(xlabel="$\omega$", ylabel="$|S(i\omega)|$",xlim=[w[0],w[-1]])
+
 display(fig)
 
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture "Frequency Domain Design I & II"</div>
+# 
 # # Closing remark
 # I'm so sorry, but everything we've done is, technically speaking, bachelor level control engineering.
+
+# %%
