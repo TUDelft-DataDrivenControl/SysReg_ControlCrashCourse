@@ -1,5 +1,21 @@
 import numpy as np
 
+import matplotlib.pyplot as plt
+import numpy.random as rng
+import scipy as sp
+import control as cm
+from matplotlib.gridspec import GridSpec
+from matplotlib.ticker import MultipleLocator
+from IPython.display import display, Markdown
+
+def isControlable(A, B):
+    Wr = cm.ctrb(A, B)
+    return np.linalg.matrix_rank(Wr) == A.shape[0]
+
+def isObservable(A, C):
+    Wo = cm.obsv(A, C)
+    return np.linalg.matrix_rank(Wo) == A.shape[0]
+
 def RK4(x, dx, h):
     k1 = dx(x)
     k2 = dx(x+h*k1/2)
@@ -50,15 +66,6 @@ def unwrap_angle(ang):
         elif ang[idx+1] - ang[idx] < -180:
             ang[idx+1:] += 360
     return ang
-
-import matplotlib.pyplot as plt
-import numpy.random as rng
-import scipy as sp
-import control as cm
-from matplotlib.gridspec import GridSpec
-from matplotlib.ticker import MultipleLocator
-from IPython.display import display, Markdown
-
 class loopShaper():
     def __init__(self, inputNoise=False, outputNoise=False):
         self.Czeros = []
