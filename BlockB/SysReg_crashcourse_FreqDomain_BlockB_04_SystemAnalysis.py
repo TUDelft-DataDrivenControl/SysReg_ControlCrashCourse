@@ -13,7 +13,7 @@ setPlotStyle()
 
 # %% [markdown]
 # ## Performance Margins
-# As established in block A: *our model always sucks*. Therefore, we might want to know how prone our controller is to destabilizing the system, because our model is wrong. There are three popular measures for 
+# As established in block A: *our model is always terrible*. Therefore, we might want to know how prone our controller is to destabilizing the system, because our model is wrong. There are three popular measures for 
 # this: the gain margin, the phase margin, and the stability margin. They're quite easy:
 # - Gain margin $g$: $\argmin_{g}$ such that $g L(s)$ becomes unstable,
 # - Phase margin $\phi$: $\argmin_{|\phi|}$ such that $e^{\phi i}L(s)$ becomes unstable (think about how that translates to a time delay!),
@@ -26,7 +26,7 @@ setPlotStyle()
 OM = np.logspace(-2, 4.5, 700)
 S = OM*1j
 
-L1 = lambda s :  200* s*(s - 1e1) / ((s + .1) * (s + 50)**2)
+L1 = lambda s :  170* s**2*(s - 1e1) / ((s + 5e-2) * (s + 3) * (s + 50)**2)
 
 L1_eval1 = L1(S)
 L1_eval2 = L1(np.flip(-S))
@@ -65,8 +65,8 @@ ax2[1].set(title="Nyquist plot - max phase",  aspect='equal',
 ax[2].axhline(180., c='C0', ls=':')
 
 idx_g_m = np.abs((L1ph_eval1 - 180.)).argmin()
-l1, = ax[2].plot([OM[idx_g_m]], [L1ph_eval1[idx_g_m]], 'o', c='C0', label="Gain Margin")
-ax[1].plot([OM[idx_g_m]], [L1mag_eval1[idx_g_m]], 'o', c='C0')
+l1, = ax[2].plot([OM[idx_g_m]], [L1ph_eval1[idx_g_m]], 's:', c='C0', label="Gain Margin")
+ax[1].plot([OM[idx_g_m]], [L1mag_eval1[idx_g_m]], 's', c='C0')
 [ax[i].axvline(OM[idx_g_m], c='C0', ls=':') for i in [1, 2]]
 g_m = 1/L1mag_eval1[idx_g_m]
 [ax2[0].plot(g_m*L1_evalq.real, g_m*L1_evalq.imag, c='C0', ls='-.') for L1_evalq in [L1_eval1, L1_eval2]]
@@ -81,7 +81,7 @@ ax[1].axhline(1., c='C1', ls=':')
 idx_phi_m_candidates = [idx for idx in range(L1mag_eval1.size - 1) if (L1mag_eval1[idx]-1) * (L1mag_eval1[idx+1]-1) < 0. 
                         and abs(L1ph_eval1[idx]) >= 90. ]
 idx_phi_m = idx_phi_m_candidates[0]
-l2, = ax[1].plot(OM[idx_phi_m], L1mag_eval1[idx_phi_m], 'o', c='C1', label="Phase Margin")
+l2, = ax[1].plot(OM[idx_phi_m], L1mag_eval1[idx_phi_m], 'o--', c='C1', label="Phase Margin")
 ax[2].plot(OM[idx_phi_m], L1ph_eval1[idx_phi_m], 'o', c='C1')
 [ax[i].axvline(OM[idx_phi_m], c='C1', ls=':') for i in [1, 2]]
 phi_m = np.abs(180 + L1ph_eval1[idx_phi_m])
@@ -89,8 +89,8 @@ phi_m = np.abs(180 + L1ph_eval1[idx_phi_m])
             c='C1', ls='-.') for L1_evalq in [L1_eval1, L1_eval2]]
 
 a = L1mag_eval1[idx_phi_m] * np.exp(np.linspace(0, np.asin(np.sin(phi_m * np.pi / 180.)))*1j)
-ax[0].plot(-a.real, a.imag, c='C1', ls=':')
-print(f"Phase margin = {np.asin(np.sin(phi_m * np.pi / 180.)) * 180. / np.pi:1.2f} degrees")
+ax[0].plot(-a.real, a.imag, c='C1', ls='--')
+print(f"Phase margin = {abs(np.asin(np.sin(phi_m * np.pi / 180.)) * 180. / np.pi):1.2f} degrees")
 
 ## Determine stability margin
 idx_s_m = np.abs(L1_eval1 + 1).argmin()
@@ -109,27 +109,28 @@ display(fig, fig2)
 # Minimum phase systems (MPS) are systems where the phase is the absolute minimum possible value for any given magnitude. Defined the other way around: MPS are systems without phase addition from factors not 
 # contributing to the magnitude. These factors are only time-delays and RHP zeros. Lets look at the difference between a LHP and RHP zero:
 # 
+# **The gains of these blocks are different! To prevent them from overlaying.**
+# 
 # %%
-OM = np.logspace(-3, 3, 700)
+OM = np.logspace(-2, 3, 700)
 S = OM*1j
 
 TFs = [.2*(S + 5.),
-       .2*(S - 5.),
-       5. / (S + 5.),
+       .3*(S - 5.),
+       3. / (S + 5.),
         ]
 
 fig, ax = plt.subplots(2,1, sharex=True)
-for tf, name, ls in zip(TFs, ["LHP zero", "RHP zero", "RHP pole"], ["-", "--", "-"]):
+for tf, name, ls in zip(TFs, ["LHP zero", "RHP zero", "RHP pole"], ["-", "--", "-."]):
         T1 = np.log(np.abs(tf))
         PH1 = np.gradient(T1, np.log(OM))
-        ax[0].loglog(OM, np.abs(tf), ls)
-        ax[1].semilogx(OM, np.angle(tf, deg=True), label=name)
+        ax[0].loglog(OM, np.abs(tf), ls, label=name)
+        ax[1].semilogx(OM, np.angle(tf, deg=True), ls, label=name)
 
-
-ax[0].set(title="Bode plot", ylabel = "$|G(s)|$")
+ax[0].set(title="Bode plot - NOT EQUAL GAINS!", ylabel = "$|G(s)|$")
 ax[1].set(xlim=[OM[0], OM[-1]], xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[1].yaxis.set_major_locator(MultipleLocator(90))
-ax[1].legend()
+ax[0].legend()
 display(fig)
 
 # %% [markdown]
@@ -142,7 +143,7 @@ display(fig)
 # <div style="text-align:center;background-color:orange;color:black;">Maybe this entire Bode block should be a seperate deep dive page...</div>
 # 
 # ## Bodes phase-magnitude relation
-# Bode has one last curve-ball for you lovely people, he has a relation named after him that couples the phase and gain of TFs for so-called "Minimum Phase Systems" (MPS). We'll look into that more in a bit, 
+# Bode has one last curve-ball for you lovely people, he has a relation named after him that couples the phase and gain of TFs for minimum phase systems. We'll look into that more in a bit, 
 # first Bode's relation. Be warned, it's not pretty at first sight: the relation is defined in Eq. 2.10 of Skogestad as
 # $$ \angle G(i\Omega) = \frac{1}{\pi}\int_{-\infty}^{\infty}\underbrace{\frac{\text{d}\log|G(i\omega)|}{\text{d}\log(\omega)}}_{N(\omega)}\;\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|
 # \frac{\text{d}\omega}{\omega} \approx 90^\circ N(\omega).$$
@@ -158,11 +159,11 @@ display(fig)
 # 
 # Lastly, there is $\frac{1}{\omega}$, causing problems when $\omega=0$.
 # 
-# Now also why in tarnation is that approximation true? That has exactly to do with the problems described just now. Let's have a gander at the function $\frac{1}{\omega}\log
+# Now also why in tarnation is that first approximation true? That has exactly to do with the problems described just now. Lets have a gander at the function $\frac{1}{\omega}\log
 # \left|\frac{\omega+\Omega}{\omega-\Omega}\right|$. We plot it for some values of $\Omega$:
 # 
 # %%
-W = [.8, 2., 20.3]
+W = [.8, 2., 2.3]
 f = lambda w, W0 : np.log(np.abs((w + W0) / (w - W0))) / w
 w = np.linspace(-max(W)-5, max(W)+5, 2000)
 
@@ -196,7 +197,7 @@ display(fig)
 # $$\delta(t) = \infty \text{ for } t = 0,\; \delta(t) = 0 \text{ otherwise, and } \int_{-\infty}^\infty\delta(t)=1.$$
 # Now you're also going to believe me that $\int_{-\infty}^\infty \frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|\text{d}\omega = \frac{\pi^2}{2}$. Then the approximation is
 # $$ \frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| \approx \frac{\pi^2}{2} \delta(\omega - \Omega).$$
-# See Sec. 3 of [Bechhoefer 2024](https://arxiv.org/abs/1107.0071) (DOI:10.1119/1.3614039) on why this is one-sided.
+# See Sec. 3 of [Bechhoefer 2011](https://arxiv.org/abs/1107.0071) (DOI:10.1119/1.3614039) on why this is one-sided.
 # 
 # Finally connecting back to the phase-gain relation, we get
 # $$ \angle G(i\Omega) = \frac{1}{\pi}\int_{-\infty}^{\infty}N(\omega)\;\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|
@@ -273,7 +274,7 @@ display(fig)
 # Then the gain margin GM $=1/|L(\omega_\text{pc})|$ and phase margin PM $=180^\circ - |\angle L(\omega_\text{gc})|$.
 # 
 # With our new theory we can also define the closed loop bandwidth, $\omega_\text{B}$, of our controlled system! This is a measure of until what frequency we can reject disturbances and it's defined as the 
-# frequency where $|T(s)|$ first crosses $\frac{1}{\sqrt2}\approx0.707\approx -3$ dB from above. Good, we have the frequencies of interest for the gain and phase margins.
+# frequency where $|T(s)|$ first crosses $\frac{1}{\sqrt2}\approx0.707\approx -3$ dB from above.
 # 
 # Now for the stability margin, $s_m$, that we defined earlier as the minimal distance between $L(s)$ and the point -1. Equivalently, this is the minimum of $|1 + L(s)|$, which coincidentally is the denominator of $S$. 
 # Therefore the stability margin occurs when the sensitivity function magnitude is the largest. Utilising that property, we define

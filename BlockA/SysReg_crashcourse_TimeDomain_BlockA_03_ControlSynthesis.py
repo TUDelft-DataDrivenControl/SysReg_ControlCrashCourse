@@ -60,25 +60,25 @@ fig, ax = plt.subplots(3,2, sharex='col', figsize=[11, 7])
 ax[0,0].set(title="Impulse response", ylabel="$u$")
 ax[1,0].set(ylabel="$y$")
 ax[2,0].set(xlabel="$t/s$", ylabel="$y$ - decomposed")
-ax[0,0].plot(impResponse.time, impResponse.inputs)
-ax[1,0].plot(impResponse.time, impResponse.outputs)
-l1, = ax[2,0].plot(impResponse.time, impTrans, label="Transient")
-l2, = ax[2,0].plot(impResponse.time, np.squeeze(P_res.D*impResponse.inputs), '--', label="Feedthrough")
+ax[0,0].plot(impResponse.time, impResponse.inputs, 'k')
+ax[1,0].plot(impResponse.time, impResponse.outputs, 'k')
+l1, = ax[2,0].plot(impResponse.time, impTrans, 'k', label="Transient")
+l2, = ax[2,0].plot(impResponse.time, np.squeeze(P_res.D*impResponse.inputs), 'k--', label="Feedthrough")
 ax[2,0].legend(handles=[l1,l2])
 
 ax[0,1].set(title="Step response")
 ax[2,1].set(xlabel="$t / s$")
-ax[0,1].plot(stpResponse.time, stpResponse.inputs)
-ax[1,1].plot(stpResponse.time, stpResponse.outputs)
-l1, = ax[2,1].plot(stpResponse.time, stpTrans, label="Transient")
-l2, = ax[2,1].plot(stpResponse.time, stpStead, '--', label="Steady State")
+ax[0,1].plot(stpResponse.time, stpResponse.inputs, 'k')
+ax[1,1].plot(stpResponse.time, stpResponse.outputs, 'k')
+l1, = ax[2,1].plot(stpResponse.time, stpTrans, 'k', label="Transient")
+l2, = ax[2,1].plot(stpResponse.time, stpStead, 'k--', label="Steady State")
 ax[2,1].legend(handles=[l1,l2])
 display(fig)
 
 # %% [markdown]
-# Decomposing a signal into a transient and steady state part? How is that possible? It really comes down to seperating the time dependent and time independent parts. By convolution of the input, we can express the state and output trajectory of any LTI system as $$ x(t) = e^{At}x_0 + \int_0^t e^{A(t-\tau)}Bu(\tau)d\tau$$ 
-# and $$ y(t) = Cx(t) + Du(t) = Ce^{At}x_0 + \int_0^t Ce^{A(t-\tau)}Bu(\tau)d\tau + Du(t).$$
-# Here, the first term is the effect of the initial condition, the second term is influenced by the input and the third term is the direct feedthrough. 
+# Decomposing a signal into a transient and steady state part? How is that possible? It really comes down to seperating the time dependent and time independent parts. Remember the closed trajectory expression $$ x(t) = e^{At}x_0 + \int_0^t e^{A(t-\tau)}Bu(\tau)d\tau$$ 
+# and 
+# $$ y(t) = Cx(t) + Du(t) = Ce^{At}x_0 + \int_0^t Ce^{A(t-\tau)}Bu(\tau)d\tau + Du(t).$$
 # 
 # Now assuming $x_0 =0$, and substituting the respective input time-signals yields the solutions $$ y_\text{impulse}(t) = \underbrace{Ce^{At}B}_\text{Transient} + \underbrace{D\delta(t)}_\text{Feedthrough}$$
 # and $$ y_\text{step}(t) = \underbrace{CA^{-1}e^{At}B}_\text{Transient} + \underbrace{D - CA^{-1}B}_\text{Steady State}.$$
@@ -110,7 +110,7 @@ unforced_reg = cm.forced_response(sysdata=P_reg,
 
 ####### Plotting #######
 fig, ax = plt.subplots()
-ax.plot(unforced_reg.time, unforced_reg.outputs)
+ax.plot(unforced_reg.time, unforced_reg.outputs, 'k--')
 ax.set(title="Unforced open loop response of $P$, non-zero initialisation", xlabel="$t/s$", ylabel="$y$")
 display(fig)
 
@@ -144,8 +144,8 @@ forced_reg = cm.forced_response(sysdata=CL_reg,
 
 ####### Plotting #######
 fig, ax = plt.subplots()
-ax.plot(unforced_reg.time, unforced_reg.outputs, '--', color="tab:orange", label="Unforced")
-ax.plot(forced_reg.time, forced_reg.outputs, color="tab:blue", label="Closed Loop")
+ax.plot(unforced_reg.time, unforced_reg.outputs, 'k--', label="Unforced")
+ax.plot(forced_reg.time, forced_reg.outputs, 'k', label="Closed Loop")
 ax.legend()
 ax.set(title="Closed loop response of $P$ and $K$, non-zero initialisation", xlabel="$t/s$", ylabel="$y$")
 display(fig)
@@ -179,10 +179,10 @@ response_sqr_ref = cm.forced_response(sysdata=CL_ref, T=T_reg, U=sqr_ref)
 response_saw_ref = cm.forced_response(sysdata=CL_ref, T=T_reg, U=saw_ref)
 
 fig, ax = plt.subplots(2,1)
-ax[0].plot(response_sqr_ref.time, response_sqr_ref.inputs , '--', color="tab:orange", label="Reference")
-ax[0].plot(response_sqr_ref.time, response_sqr_ref.outputs, color="tab:blue", label="CL System")
-ax[1].plot(response_saw_ref.time, response_saw_ref.inputs , '--', color="tab:orange", label="Reference")
-ax[1].plot(response_saw_ref.time, response_saw_ref.outputs, color="tab:blue", label="CL System")
+ax[0].plot(response_sqr_ref.time, response_sqr_ref.inputs , 'k--', label="Reference")
+ax[0].plot(response_sqr_ref.time, response_sqr_ref.outputs, 'k', label="CL System")
+ax[1].plot(response_saw_ref.time, response_saw_ref.inputs , 'k--', label="Reference")
+ax[1].plot(response_saw_ref.time, response_saw_ref.outputs, 'k', label="CL System")
 ax[0].legend()
 ax[0].set(title="Closed loop reference tracking", ylabel="$y$")
 ax[1].set(xlabel="$t/s$", ylabel="$y$")
@@ -191,7 +191,7 @@ display(fig)
 # %% [markdown]
 # 
 # ## Integral action
-# &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*The theory of everything is not found yet, so our model **always** sucks*
+# &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*The theory of everything is not found yet, so our model is **always** terrible*
 # 
 # Most likely the model we have is not a perfect representation of the real world. "Neglect air friction, neglect static/dynamic friction and hysteresis, assume rigid bodies, assume perfect efficiency, ..." 
 # All lies we tell ourselves to make our lives easier and to blind ourselves to the harsh reality.
@@ -230,12 +230,12 @@ response_sqr_int = cm.forced_response(sysdata=CL_int, T=T_reg, U=sqr_ref)
 response_saw_int = cm.forced_response(sysdata=CL_int, T=T_reg, U=saw_ref)
 
 fig, ax = plt.subplots(2,1)
-ax[0].plot(response_sqr_ref.time, response_sqr_ref.inputs , '--', color="tab:orange", label="Reference")
-ax[0].plot(response_sqr_ref.time, response_sqr_ref.outputs, color="tab:blue", label="CL System")
-ax[0].plot(response_sqr_int.time, response_sqr_int.outputs, ':', color="tab:green", label="System + integral")
-ax[1].plot(response_saw_ref.time, response_saw_ref.inputs , '--', color="tab:orange", label="Reference")
-ax[1].plot(response_saw_ref.time, response_saw_ref.outputs, color="tab:blue", label="CL System")
-ax[1].plot(response_saw_int.time, response_saw_int.outputs, ':', color="tab:green", label="System + integral")
+ax[0].plot(response_sqr_ref.time, response_sqr_ref.inputs , 'k--', label="Reference")
+ax[0].plot(response_sqr_ref.time, response_sqr_ref.outputs, 'k', label="CL System")
+ax[0].plot(response_sqr_int.time, response_sqr_int.outputs, 'k:', label="System + integral")
+ax[1].plot(response_saw_ref.time, response_saw_ref.inputs , 'k--', label="Reference")
+ax[1].plot(response_saw_ref.time, response_saw_ref.outputs, 'k', label="CL System")
+ax[1].plot(response_saw_int.time, response_saw_int.outputs, 'k:', label="System + integral")
 ax[0].legend()
 ax[0].set(title="Closed loop reference tracking with integral action", ylabel="$y$")
 ax[1].set(xlabel="$t/s$", ylabel="$y$")
@@ -258,10 +258,10 @@ P_pert.C *= rng.randn()*.2 + 1.
 
 fig, ax = plt.subplots(1, 1)
 ax.axvline(color='k')
-s1 = ax.scatter(P_reg.poles().real, P_reg.poles().imag, marker='x', color='tab:blue', label="Old poles")
-        
-s2 = ax.scatter(P_pert.poles().real, P_pert.poles().imag, marker='x', color='tab:orange', label="New poles")
-ax.legend(handles=[s1,s2])
+s1 = ax.plot(P_reg.poles().real, P_reg.poles().imag, 'kx', label="Old poles")
+s2 = ax.plot(P_pert.poles().real, P_pert.poles().imag, 'k*', label="New poles")
+ax.legend()
+display(fig)
 
 # %%
 CL_pert = cm.ss(P_pert.A-P_pert.B@K_reg, 
@@ -284,12 +284,12 @@ response_sqr_int_pert = cm.forced_response(sysdata=CL_int_pert, T=T_reg, U=sqr_r
 response_saw_int_pert = cm.forced_response(sysdata=CL_int_pert, T=T_reg, U=saw_ref)
 
 fig, ax = plt.subplots(2,1)
-ax[0].plot(response_sqr_ref_pert.time, response_sqr_ref_pert.inputs , '--', color="tab:orange", label="Reference")
-ax[0].plot(response_sqr_ref_pert.time, response_sqr_ref_pert.outputs, color="tab:blue", label="CL System")
-ax[0].plot(response_sqr_int_pert.time, response_sqr_int_pert.outputs, ':', color="tab:green", label="System + integral")
-ax[1].plot(response_saw_ref_pert.time, response_saw_ref_pert.inputs , '--', color="tab:orange", label="Reference")
-ax[1].plot(response_saw_ref_pert.time, response_saw_ref_pert.outputs, color="tab:blue", label="CL System")
-ax[1].plot(response_saw_int_pert.time, response_saw_int_pert.outputs, ':', color="tab:green", label="System + integral")
+ax[0].plot(response_sqr_ref_pert.time, response_sqr_ref_pert.inputs , 'k--', label="Reference")
+ax[0].plot(response_sqr_ref_pert.time, response_sqr_ref_pert.outputs, 'k', label="CL System")
+ax[0].plot(response_sqr_int_pert.time, response_sqr_int_pert.outputs, 'k:', label="System + integral")
+ax[1].plot(response_saw_ref_pert.time, response_saw_ref_pert.inputs , 'k--', label="Reference")
+ax[1].plot(response_saw_ref_pert.time, response_saw_ref_pert.outputs, 'k', label="CL System")
+ax[1].plot(response_saw_int_pert.time, response_saw_int_pert.outputs, 'k:', label="System + integral")
 ax[0].legend()
 ax[0].set(title="Closed loop reference tracking with perturbed plant", ylabel="$y$")
 ax[1].set(xlabel="$t/s$", ylabel="$y$")
@@ -302,7 +302,7 @@ display(fig)
 # <div style="text-align:center;background-color:tomato;">End of lecture 6</div>
 
 # %% [markdown]
-# ## Art is for suckers and should be optimised
+# ## I don't understand art and it should be optimised
 # &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*If you believe AI artists are artist, you're wrong, but you'll like this part.*
 # 
 # Linear Quadratic Regulators (LQR) have a special place in my heart. Instead of having a (in some sense) heuristic $K$, smarter people than me came up with the idea of expressing $K$ as 
@@ -353,14 +353,14 @@ response_lqr = cm.forced_response(sysdata=CL_lqr,
                                   U=step_lqr)
 
 fig, ax = plt.subplots(2,1)
-ax[0].plot(response_pp.time, response_pp.inputs, '--', color="tab:orange", label="Reference")
-ax[0].plot(response_pp.time, response_pp.outputs, color="tab:blue", label="Pole Placement")
-ax[0].plot(response_lqr.time, response_lqr.outputs, color="tab:brown", label="LQR")
+ax[0].plot(response_pp.time, response_pp.inputs, 'k--', label="Reference")
+ax[0].plot(response_pp.time, response_pp.outputs, 'k', label="Pole Placement")
+ax[0].plot(response_lqr.time, response_lqr.outputs, 'k:', label="LQR")
 ax[0].legend()
 ax[0].set(ylabel="$y$")
 
-ax[1].plot(response_pp.time , (-K_pp  @ response_pp.states)[0,:]  + kf_pp*response_pp.inputs, color="tab:blue", label="Pole Placement")
-ax[1].plot(response_lqr.time, (-K_lqr @ response_lqr.states)[0,:] + kf_lqr*response_lqr.inputs, color="tab:brown", label="LQR")
+ax[1].plot(response_pp.time , (-K_pp  @ response_pp.states)[0,:]  + kf_pp*response_pp.inputs, 'k', label="Pole Placement")
+ax[1].plot(response_lqr.time, (-K_lqr @ response_lqr.states)[0,:] + kf_lqr*response_lqr.inputs, 'k:', label="LQR")
 ax[1].set(ylabel="$u$", xlabel="$t$ / s")
 display(fig)
 

@@ -38,7 +38,7 @@ setPlotStyle()
 # &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Most control engineers aren't as stable as their systems*
 # 
 # If you know epsilon-delta proofs, I'm sorry for your loss. There is an epsilon-delta definition of stability in the slides, have fun. For normal people stability means that a certain system trajectory 
-# stays bounded under bounded disturbances. Even simpler: a stable system always returns to certain points. The stability of certain equilibria is easy to assess, since the linearisation is a good 
+# stays bounded under bounded inputs. Even simpler: a stable system always returns to certain points. The stability of certain equilibria is easy to assess, since the linearisation is a good 
 # approximation locally at the equilibrium point, the stability of the linearised system indicates the stability of the equilibrium point too.
 # 
 # ### Stability of linear systems
@@ -47,7 +47,7 @@ setPlotStyle()
 # 1. The characteristic polynomial is equivalent to det($sI-A$) for complex $s$.
 # 2. The roots of the characteristic polynomial are equivalent to the eigenvalues of $A$.
 # 
-# That second point sounds familiar! We already saw stability related to the roots of the characteristic polynomial before. So, the eigenvalues, $\Lambda$, of $A$ reveal the stability of the system. 
+# That second point sounds familiar! We already saw stability related to the roots of the characteristic polynomial before. So, the eigenvalues of $A$, $\Lambda$, reveal the stability of the system. 
 # Surprisingly though, there are three types of stability, not two:
 # 1. Unstable $\leftarrow \exist\mathfrak{R}(\lambda)>0, \lambda\in\Lambda$.
 # 2. Neutrally stable $\leftarrow \mathfrak{R}(\lambda)\leq 0, \forall\lambda\in\Lambda$ with at most one eigenvalue at 0 or on conjugate pair with real part 0.
@@ -139,7 +139,7 @@ display(fig)
 # and $$ y = Cx + Du \rightarrow y = \underbrace{CT^{-1}}_{\tilde C}z + Du = \tilde C z + Du.$$
 # **Important: note that the input/output behaviour remains unchanged under state transformations. This is only a system-internal operation.**
 # 
-# For $A$ with unique eigenvalues, the system is called diagonalisable, because taking the inverse transformation, $T^{-1}$, to be the horizontally stacked eigenvectors of $A$ results in a diagonal 
+# For systems with unique eigenvalues, the system is called diagonalisable, because taking the inverse transformation, $T^{-1}$, to be the horizontally stacked eigenvectors of $A$ results in a diagonal 
 # $\tilde A$. Sometimes stuff is named nice and descriptive.
 
 # %% [markdown]
@@ -147,6 +147,12 @@ display(fig)
 
 # %% [markdown]
 # ## Reachability
+# Now there is a nice closed form expression of system trajectories given any input!  By convolution of the input, we can express the state and output trajectory of any LTI system as 
+# $$ x(t) = e^{At}x_0 + \int_0^t e^{A(t-\tau)}Bu(\tau)d\tau$$ 
+# and 
+# $$ y(t) = Cx(t) + Du(t) = Ce^{At}x_0 + \int_0^t Ce^{A(t-\tau)}Bu(\tau)d\tau + Du(t).$$
+# Here, the first term is the effect of the initial condition, the second term is influenced by the input and the third term is the direct feedthrough. 
+# 
 # This output trajectory expression answers some interesting questions too: what states are we able to control the system to? This is called the reachability of the system! Remember we have equilibria 
 # $(\bar x, \bar u) \leftarrow A\bar x + B\bar u = 0$? Well then if $A$ is invertible this means that $\bar x = -A^{-1}B\bar u$. So, if $A^{-1}B$ is full rank, we can attain any steady state we'd desire!
 # 
@@ -228,7 +234,7 @@ for omega0, axIdx1 in zip(Omega0, range(len(Omega0))):
     for zeta, axIdx2 in zip(Zeta, range(len(Zeta))):
         Pq = cm.ss(1/(s**2 + 2*zeta*omega0*s + omega0**2), dt=0)
         response = cm.forced_response(Pq, T=T, U=np.ones_like(T))
-        ax[axIdx1, axIdx2].plot(response.time, response.outputs)
+        ax[axIdx1, axIdx2].plot(response.time, response.outputs, 'k')
 
 [ax[0,p].set(title=f"$\zeta={Zeta[p]}$") for p in range(len(Zeta))]
 [ax[p,0].set(ylabel=f"$\omega_0={Omega0[p]}$") for p in range(len(Omega0))]
@@ -264,14 +270,14 @@ response_dom =    cm.forced_response(P_dom,    T=T_dom, U=np.ones_like(T_dom))
 response_dom_2d = cm.forced_response(P_dom_2d, T=T_dom, U=np.ones_like(T_dom))
 
 fig, ax = plt.subplots(1, 2)
-ax[0].plot(P_dom.poles().real, P_dom.poles().imag, 'x', color='tab:blue', label="Poles")
-ax[0].plot(P_dom_2d.poles().real, P_dom_2d.poles().imag, '+', color='tab:orange', label="Dominant poles")
+ax[0].plot(P_dom.poles().real, P_dom.poles().imag, 'kx', label="Poles")
+ax[0].plot(P_dom_2d.poles().real, P_dom_2d.poles().imag, 'k+', label="Dominant poles")
 ax[0].set(title="Pole map", xlabel="Re($\lambda$)", ylabel="Im($\lambda$)")
 ax[0].legend()
 
 
-l0 = ax[1].plot(response_dom.time, response_dom.outputs, color="tab:blue", label="Original sys.")
-l1 = ax[1].twinx().plot(response_dom_2d.time, response_dom_2d.outputs, '--', color="tab:orange", label="2nd order sys.")
+l0 = ax[1].plot(response_dom.time, response_dom.outputs, 'k', label="Original sys.")
+l1 = ax[1].twinx().plot(response_dom_2d.time, response_dom_2d.outputs, 'k--', label="2nd order sys.")
 ax[1].legend(handles = [l0[0], l1[0]])
 ax[1].set(title="Step response (ignore scaling)", xlabel="t/s")
 display(fig)
