@@ -28,7 +28,8 @@ from helperFunctions import *
 # 1. the Dirac-delta impulse signal
 # 2. and the (Heaviside) step signal.
 # 
-# The impulse signal is primarily used to see the transient behaviour of the system and the step functions shows the transient and steady state behaviour. Look at these plots to see! We're even able to seperate the transient from the steady state for the step!
+# The impulse signal is primarily used to see the transient behaviour of the system and the step functions shows the transient and steady state behaviour. Look at these plots to see! We're even able to 
+# seperate the transient from the steady state for the step!
 
 # %%
 # Create random system
