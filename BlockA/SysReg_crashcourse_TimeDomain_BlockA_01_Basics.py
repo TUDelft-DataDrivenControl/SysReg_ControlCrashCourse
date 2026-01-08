@@ -2,25 +2,11 @@
 %matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams.update({ 'text.usetex':        False,              'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'})
-
-from IPython.display import display, Markdown
-
+from IPython.display import display
 import warnings
 warnings.filterwarnings("ignore")
-
-import scipy.signal as signal
-import scipy.linalg as sclin
-import numpy.random as rng
-import numpy.linalg as lin
-import control as cm
 from helperFunctions import *
+setPlotStyle()
 
 # %% [markdown]
 # # Time domain
@@ -55,14 +41,16 @@ from helperFunctions import *
 
 # %%
 ## Eigenvalues
-sig1 = -0.8
-sig2 = 3 + 15j
-sig3 = -0.5 + 5j
+SIG =  [ -0.8,
+         2 + 15j,
+         -0.5 + 5j,
+         -0.5 - 5j,
+        ] # Add or remove any you'd like to see
 
 ###### Plotting #########
-fig, ax = plt.subplots(1,3)
-for sig, idx in zip([sig1, sig2, sig3], range(3)):
-    t = np.linspace(0, 3/abs(np.real(sig)), num=300) # Adapt to convergence speed
+fig, ax = plt.subplots(1,len(SIG))
+for sig, idx in zip(SIG, range(len(SIG))):
+    t = np.linspace(0, 3/abs(sig.real) if sig.real != 0 else 1, 300) # Adapt to convergence speed
     if np.iscomplex(sig): # Plot decomposition
         l1, = ax[idx].plot(t, np.exp(sig.real * t), 'r--', label=f"$e^{r"{"}{sig.real}t{r"}"}$") # Upper envelope
         ax[idx].plot(t, -np.exp(sig.real * t), 'r--') # Lower envelope
@@ -97,16 +85,12 @@ display(fig)
 # 
 # It's a nice sanity check that any fundamental block scheme of an $n$-th order system has $n$ integrators.
 # 
-# 
 # ## Equilibrium points
 # &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*Forever and unchanging*
 # 
 # Often, systems will have equilibria, meaning there are states where system will remain over time. These state-input point pairs are denoted as $(x_e, u_e)$ or $(\bar x, \bar u)$. I'll use the latter since this is more traditional in control and we have to appease our control elders (JW). So equilibria remain unchanging, so the derivative of the state is zero. In mathematicians' language
 # $$ \dot{\bar x} = f(\bar x, \bar u) = 0. $$
 # Finding the equilibria states as a function of the equilibria inputs is as simple as solving this equation.
-# 
-# 
-# 
 # 
 
 # %% [markdown]

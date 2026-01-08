@@ -2,25 +2,14 @@
 %matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams.update({ 'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'
-                    })
-
 from matplotlib.ticker import MultipleLocator
 from matplotlib.gridspec import GridSpec
-from IPython.display import display, Markdown
+from IPython.display import display
 
 import warnings
 warnings.filterwarnings("ignore")
-
-import control as cm
 from helperFunctions import *
-
+setPlotStyle()
 
 # %% [markdown]
 # ## Performance Margins
@@ -119,6 +108,7 @@ display(fig, fig2)
 # ## Minimum Phase Systems
 # Minimum phase systems (MPS) are systems where the phase is the absolute minimum possible value for any given magnitude. Defined the other way around: MPS are systems without phase addition from factors not 
 # contributing to the magnitude. These factors are only time-delays and RHP zeros. Lets look at the difference between a LHP and RHP zero:
+# 
 # %%
 OM = np.logspace(-3, 3, 700)
 S = OM*1j

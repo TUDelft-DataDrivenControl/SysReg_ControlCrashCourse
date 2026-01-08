@@ -2,14 +2,6 @@
 %matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams.update({ 'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'
-                    })
 
 from matplotlib.ticker import MultipleLocator
 from matplotlib.gridspec import GridSpec
@@ -19,9 +11,8 @@ from IPython.display import display
 import warnings
 warnings.filterwarnings("ignore")
 
-import control as cm
 from helperFunctions import *
-
+setPlotStyle()
 
 # %% [markdown]
 # # Visualising complex numbers
@@ -192,7 +183,7 @@ def anim_init(z1, ax):
         ax[i].annotate("$z_1$", xy=(np.real(z1), np.imag(z1)),
                     xytext=(.5,.3), textcoords='offset fontsize', color='red')
 
-    ## Animation time! Yeah don't focus too much on this it's fine
+    ## Animation time! Don't focus too much on this it's fine
     r = cntr - z1
     rm = np.max(np.abs(r))
     ax[1].set(aspect='equal', xlabel="$\mathfrak{Re}\{G(s)\}$", ylabel="$\mathfrak{Im}\{G(s)\}$", xlim=[-rm+np.real(z1), rm+np.real(z1)], ylim=[-rm+np.imag(z1),rm+np.imag(z1)])
@@ -331,7 +322,6 @@ ang1, ang2, ang = unwrap_angle(np.angle(L1_eval1, deg=True)), unwrap_angle(np.an
 
 ax[2].cla()
 ax[2].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
-# ax[2].semilogx(np.abs(OM_full), ang, 'k')
 ax[2].semilogx(np.abs(OM_full)[:OM_full.size//2], ang[:OM_full.size//2], 'k')
 ax[2].semilogx(np.abs(OM_full)[OM_full.size//2:], ang[OM_full.size//2:], 'k--')
 
@@ -358,3 +348,6 @@ def animate(t):
 anim = animation.FuncAnimation(fig, func=animate, frames=50, interval=150, blit=True)
 
 display(anim)
+
+# %% [markdown]
+# Note the relation between the two plots!

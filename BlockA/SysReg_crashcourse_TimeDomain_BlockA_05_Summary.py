@@ -2,32 +2,22 @@
 %matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams.update({ 'text.usetex':        False,              'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'})
-
-from IPython.display import display, Markdown
+from IPython.display import display
 
 import warnings
 warnings.filterwarnings("ignore")
-
-import scipy.signal as signal
-import scipy.linalg as sclin
 import numpy.random as rng
 import numpy.linalg as lin
 import control as cm
 from helperFunctions import *
-
+setPlotStyle()
 
 # %% [markdown]
 # ## Connecting the dots
 # 
 # Time to make the full picture: state feedback control with state estimation! Some important things to note:
-# - Since the state feedback is based on the state estimation, we want the error to go to zero faster than the controller works. If the controller is faster than the observer you're just doing random stuff basically until the estimate converges. Rule of thumb: the observer should be 4 to 10 times faster (larger magnitude poles) than the controller.
+# - Since the state feedback is based on the state estimation, we want the error to go to zero faster than the controller works. If the controller is faster than the observer you're just doing 
+# random stuff basically until the estimate converges. Rule of thumb: the observer should be 4 to 10 times faster (larger magnitude poles) than the controller.
 # - Making the observer extremely fast works well in theory, but as soon as your output is noisy, the fast observer will amplify this noise enourmously and your estimate will be terrible.
 # - In the example below I'll make an LQR observer, but since the observer is a regulator type controller, no feedforward gain is needed.
 # - Strictly speaking you can classify this as output feedback

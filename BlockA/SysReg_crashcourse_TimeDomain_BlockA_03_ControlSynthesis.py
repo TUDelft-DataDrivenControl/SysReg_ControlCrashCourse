@@ -2,16 +2,7 @@
 %matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams.update({ 'text.usetex':        False,              'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'})
-
-from IPython.display import display, Markdown
-
+from IPython.display import display
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -21,6 +12,7 @@ import numpy.random as rng
 import numpy.linalg as lin
 import control as cm
 from helperFunctions import *
+setPlotStyle()
 
 # %% [markdown]
 # ## Textbook input signals
@@ -40,7 +32,7 @@ T_res = np.arange(1000)*0.02 - 1.
 
 ## impulse response
 impIn = np.zeros_like(T_res)
-impIn[int(-T_res[0]/(T_res[1] - T_res[0]))] = 1./0.02
+impIn[int(-T_res[0]/(T_res[1] - T_res[0]))] = 1./(T_res[1] - T_res[0])
 impResponse = cm.forced_response(P_res,
                                  T = T_res,
                                  U = impIn)

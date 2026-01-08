@@ -2,25 +2,14 @@
 %matplotlib notebook
 import numpy as np
 import matplotlib.pyplot as plt
-plt.rcParams.update({ 'mathtext.fontset':         'cm',
-                      'font.size':          12.0,               'axes.labelsize':           'medium',
-                      'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
-                      'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                      'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
-                      'figure.constrained_layout.use': True,    'scatter.marker':           'x',
-                      'animation.html':     'jshtml'
-                    })
-
-from matplotlib.ticker import MultipleLocator
 from matplotlib.gridspec import GridSpec
-import matplotlib.animation as animation
-from IPython.display import display, Markdown
+from IPython.display import display
 
 import warnings
 warnings.filterwarnings("ignore")
 
-import control as cm
 from helperFunctions import *
+setPlotStyle()
 
 
 # %% [markdown]

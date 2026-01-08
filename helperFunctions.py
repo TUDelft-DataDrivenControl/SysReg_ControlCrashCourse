@@ -8,6 +8,15 @@ from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import MultipleLocator
 from IPython.display import display, Markdown
 
+def setPlotStyle():
+    plt.rcParams.update({   'text.usetex':        False,              'mathtext.fontset':         'cm',
+                            'font.size':          12.0,               'axes.labelsize':           'medium',
+                            'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
+                            'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
+                            'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
+                            'figure.constrained_layout.use': True,    'scatter.marker':           'x',
+                            'animation.html':     'jshtml'})
+
 def isControlable(A, B):
     Wr = cm.ctrb(A, B)
     return np.linalg.matrix_rank(Wr) == A.shape[0]
