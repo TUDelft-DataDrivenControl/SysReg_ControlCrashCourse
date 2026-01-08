@@ -169,5 +169,25 @@ display(fig)
 # %% [markdown]
 # <div style="text-align:center;background-color:tomato;">End of lecture "Frequency Domain Design I & II"</div>
 # 
+# # I promised PID
+# **Note: PID is a regulator, not a tracker, apply it to the error signal.**
+# 
+# So in the slides there is some info on time-domain tuning of PID, mostly [Ziegler-Nichols](https://en.wikipedia.org/wiki/Ziegler%E2%80%93Nichols_method) methods. Generally they're okay, not very impressive
+# though and almost never optimal. I'm here to show you that PID has loop shaping equivalents. Starting with the standard ideal PID controller:
+# $$ C(s) = K_p + \frac{K_i}{s} + sK_d. $$
+# Rewriting gives
+# $$ C(s) = K_p\frac{s}{s} + \frac{K_i}{s} + sK_d\frac{s}{s} = \frac{K_d s^2 + K_p s + K_i}{s} = K_d \frac{s^2 + \frac{K_p}{K_d} s + \frac{K_i}{K_d}}{s}. $$
+# Now we recognise a zero pair and integrator, and control gain $K_d$. Retrieving the damping ratio and natural frequency of this zeros pair gives
+# $$\left.\begin{aligned} &2\zeta\omega_0 = \frac{K_p}{K_d} \\ &\omega_0^2 = \frac{K_i}{K_d} \end{aligned} \right\}\therefore (\omega_0, \zeta) = \left(\sqrt{\frac{K_i}{K_d}}, 
+# \frac{K_p\sqrt{\frac{K_i}{K_d}}}{2K_i}\right).$$
+# And there you have the equivalence between loop shaping and PID tuning. We have
+# | Controller | Tools |
+# | ---------- | ----- |
+# | PID         | Gain, zero pair, integrator |
+# | PI          | Gain, one zero, integrator |
+# | PD          | Gain, one zero |
+# 
+# So PID is just a limited version of loopshaping.
+# 
 # # Closing remark
 # I'm so sorry, but everything we've done is, technically speaking, bachelor level control engineering.
