@@ -3,16 +3,13 @@
 # Okay now stuff actually gets a little tricky so I'll have to be a bit more serious sadly.
 # ## The Laplace (and Fourier) Transform is a godsent
 # ### Transform of arbitrary signals
-# Suppose you have a time-varying signal $u(t)$, then there exists its (bilateral) Laplace or Fourier transform $U(s)$, where $s = \sigma + i\omega$ for the Laplace transform and $s = i\omega$ for 
-# the Fourier transform.
+# Suppose you have a time-varying signal $u(t)$, then there exists its (bilateral) Laplace or Fourier transform $U(s)$, where $s = \sigma + i\omega$ for the Laplace transform and $s = i\omega$ for the Fourier transform.
 # 
 # These transforms are defined as 
-# 
 # $$\mathcal{L}\{u(t)\}(s) = U(s) = \int_{-\infty}^\infty u(t) e^{-st} \text{d}t,\; s \in \mathbb{C}$$
 # and
 # $$\mathcal{F}\{u(t)\}(\omega) = U(\omega) = \int_{-\infty}^\infty u(t) e^{-i\omega t} \text{d}t,\; \omega \in \mathbb{R}.$$
-# And now you know why it's called the frequency domain: $\mathfrak{Re}(e^{-st})$ is a (dampened) oscillation!
-# To be completely honest, this is *way* too big of a subject for me to explain. However, I don't have to because of legends like 3Blue1Brown, go watch these if you want to know more:
+# And now you know why it's called the frequency domain: $\mathfrak{Re}(e^{-st})$ is a (dampened) oscillation! To be completely honest, this is *way* too big of a subject for me to explain. However, I don't have to because of legends like 3Blue1Brown, go watch these if you want to know more:
 # - [watch this video on what Fourier transforms are](https://www.youtube.com/watch?v=r6sGWTCMz2k)
 # - [and this one on Laplace transforms.](https://www.youtube.com/watch?v=FE-hM1kRK4Y)
 # - [Just watch his playlist on differential equations really, the man's a treasure.](https://www.youtube.com/playlist?list=PLZHQObOWTQDNPOjrT6KVlfJuKtYTftqH6)
@@ -22,8 +19,7 @@
 # - These transforms basically say that **any** time signal is a sum of (dampened) sinusoids,
 # - Both transforms are linear.
 # 
-# Furthermore, some interesting mathematical fact:
-# Starting with the definition again
+# Furthermore, some interesting mathematical fact: starting with the definition again
 # $$\mathcal{L}\{u(t)\}(s) = U(s) = \int_{-\infty}^\infty u(t) e^{-st} \text{d}t,\; s \in \mathbb{C}$$
 # and integrating by part [(trust me bro)](https://en.wikipedia.org/wiki/Integration_by_parts)
 # $$ \mathcal{L}\{u(t)\}(s) = \left[\frac{u(t) e^{-st}}{-s} \right]_{-\infty}^\infty + \frac{1}{s} \mathcal{L}\left\{\frac{\text{d} u(t)}{\text{d}t}\right\}(s) $$

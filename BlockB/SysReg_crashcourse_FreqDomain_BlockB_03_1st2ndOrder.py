@@ -129,8 +129,7 @@ display(fig)
 
 # %% [markdown]
 # ### Combining transfer function blocks
-# We're going to design three filters here to wrap up: a notch filter, a lead-lag filter and a PID! First the notch, it consists of a pole pair and a zero pair with the same natural frequency, but 
-# different damping ratios. I'll also stop plotting the complex plane, you get the link by now.
+# We're going to design three filters here to wrap up: a notch filter, a lead-lag filter and a PID! First the notch, it consists of a pole pair and a zero pair with the same natural frequency, but different damping ratios. I'll also stop plotting the complex plane, you get the link by now.
 
 # %%
 om_n, zeta_p, zeta_z = 0.7, 5e-1, 1e-4
@@ -159,8 +158,7 @@ display(fig)
 # %% [markdown]
 # You can figure out yourself what color is the poles/zeros <3. Notice how the curves can be 'added' when in reality they're multiplied, because they're plotted on a log scale.
 # 
-# Now the lead lag: it also consists of a pole pair and a zero pair, but with different natural frequencies and the same damping ratio, and we need to 
-# compensate the steady state gain (for $\omega = 0$):
+# Now the lead lag: it also consists of a pole pair and a zero pair, but with different natural frequencies and the same damping ratio, and we need to compensate the steady state gain (for $\omega = 0$):
 
 # %%
 om_p, om_z, zeta1 = .1, 4., 0.05

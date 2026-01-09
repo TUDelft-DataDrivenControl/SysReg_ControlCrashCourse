@@ -17,23 +17,16 @@ setPlotStyle()
 # %% [markdown]
 # # Visualising complex numbers
 # ## Bode plots
-# Okay, so we can describe systems in the frequency domain with these funky transfer functions, so what? Well, we still have some way to go before we can start doing 
-# useful stuff... I told you this was the part where it got messy.
+# Okay, so we can describe systems in the frequency domain with these funky transfer functions, so what? Well, we still have some way to go before we can start doing useful stuff... I told you this was the part where it got messy.
 # 
 # Just to be clear, we have a transfer function $G(s)$ that maps the complex plane to the complex plane, i.e.
 # $$ G: \mathbb{C} \rightarrow \mathbb{C}.$$
-# Then we have the steady state output being $Y(s) = G_{yu}(s)U(s)$, so for a given $s$, $Y(s)$ is the product of two complex numbers $G_{yu}(s)$ and $U(s)$. Remember for complex numbers: multiplication means 
-# multiplying the modulus/magnitude and adding the argument/angle/phase, i.e. $ae^{ci}\;be^{di} = abe^{(c+d)i}$. Likewise, division is division and subtraction, respectively, i.e. 
-# $\frac{ae^{ci}}{be^{di}} = \frac{a}{b}e^{(c-d)i}$. These 
-# two rules can be used to combine simple transfer function 'blocks' into more complicated functions. In any case, any input $U(s)$ will be amplified with $|G_{yu}(s)|$ and shifted with $\angle G_{yu}(s)$ to 
-# the output $Y(s)$, because they're multiplied.
+# Then we have the steady state output being $Y(s) = G_{yu}(s)U(s)$, so for a given $s$, $Y(s)$ is the product of two complex numbers $G_{yu}(s)$ and $U(s)$. Remember for complex numbers: multiplication means multiplying the modulus/magnitude and adding the argument/angle/phase, i.e. $ae^{ci}\;be^{di} = abe^{(c+d)i}$. Likewise, division is division and subtraction, respectively, i.e. $\frac{ae^{ci}}{be^{di}} = \frac{a}{b}e^{(c-d)i}$. These two rules can be used to combine simple transfer function 'blocks' into more complicated functions. In any case, any input $U(s)$ will be amplified with $|G_{yu}(s)|$ and shifted with $\angle G_{yu}(s)$ to the output $Y(s)$, because they're multiplied.
 # 
 # Now we want to visualise the behaviour of $G$, since that gives us a ton of information on that steady state input-output behaviour of the system. This can be done with *Bode* plots.
 #  **Important: Bode plots use the Fourier transform, so $s=i\omega$ !**
 # 
-# So Bode follows the following rationale: $G$ maps the imaginary axis (pure sinusoids in time domain) to some other curve in the complex plane, not on the imaginary axis per
-#  se. Any complex number can be defined through their modulus/magnitude/gain and argument/angle/phase, so plotting these against the oscillation frequency, $\omega$, defines the curve in the complex plane. 
-# The gain is usually plotted on a log-log scale and the phase on a lin-log scale. Lets have a look at how that looks like for the simplest functions, $G = s^n$.
+# So Bode follows the following rationale: $G$ maps the imaginary axis (pure sinusoids in time domain) to some other curve in the complex plane, not on the imaginary axis per se. Any complex number can be defined through their modulus/magnitude/gain and argument/angle/phase, so plotting these against the oscillation frequency, $\omega$, defines the curve in the complex plane. The gain is usually plotted on a log-log scale and the phase on a lin-log scale. Lets have a look at how that looks like for the simplest functions, $G = s^n$.
 
 # %%
 N = range(-2,3)
@@ -79,10 +72,7 @@ display(fig)
 # ### Definition
 # Wikipedia gives this definition of the criterion:
 # 
-# >Given a Nyquist contour $\Gamma_s$, let $P$ be the number of poles of $L(s)$ encircled by $\Gamma_s$, and $Z$ be the number of zeros of $1+L(s)$ encircled by $\Gamma_s$. Alternatively, and 
-# more importantly, if $Z$ is the number of poles of 
-# the closed loop system in the right half plane, and $P$ is the number of poles of the open-loop transfer function $L(s)$ in the right half plane, the resultant contour in the $L(s)$-plane, 
-# $\Gamma_{L(s)}$, shall encircle (clockwise) the point $(-1+j0)$ $N$ times such that $N = Z - P$.
+# >Given a Nyquist contour $\Gamma_s$, let $P$ be the number of poles of $L(s)$ encircled by $\Gamma_s$, and $Z$ be the number of zeros of $1+L(s)$ encircled by $\Gamma_s$. Alternatively, and more importantly, if $Z$ is the number of poles of the closed loop system in the right half plane, and $P$ is the number of poles of the open-loop transfer function $L(s)$ in the right half plane, the resultant contour in the $L(s)$-plane, $\Gamma_{L(s)}$, shall encircle (clockwise) the point $(-1+j0)$ $N$ times such that $N = Z - P$.
 # 
 # That's pretty overwhelming! Let's take it apart:
 # - Nyquist contour $\Gamma_s$: this is defined as the clockwise contour encompassing the Right Half of the imaginary Plane (RHP). It is also the collection of all $s$ we'll consider.
@@ -92,15 +82,10 @@ display(fig)
 # - $N$: the number of clockwise rotations around $-1+j0$ of $L(\Gamma_s)$, and $N=Z-P$.
 # 
 # ### Stability
-# So $Z$ is supposedly the number of unstable poles of the closed loop system. Then if $Z=0$, there are no RHP poles destabilizing the closed loop, so the closed loop is stable! Now we also 
-# got that $N=Z-P\rightarrow Z=N+P$, so we can just count the clockwise encirclements in the Nyquist plot $L(\Gamma_s)$ and add it to the number of RHP poles of $L(s)$ and if that's zero the 
-# closed loop is stable! Wait but something added to something should be zero? Good question, $N$ is positive for clockwise encirclements, but negative for counterclockwise encirclements. So, alternatively, 
-# we can say the closed loop is stable if (and only if) the **net** number of counterclockwise encirclements of $-1+j0$ is equal to the number of RHP poles of $L(s)$. This is our main use for the Nyquist 
-# criterion, because this is how we assess stability.
+# So $Z$ is supposedly the number of unstable poles of the closed loop system. Then if $Z=0$, there are no RHP poles destabilizing the closed loop, so the closed loop is stable! Now we also got that $N=Z-P\rightarrow Z=N+P$, so we can just count the clockwise encirclements in the Nyquist plot $L(\Gamma_s)$ and add it to the number of RHP poles of $L(s)$ and if that's zero the closed loop is stable! Wait but something added to something should be zero? Good question, $N$ is positive for clockwise encirclements, but negative for counterclockwise encirclements. So, alternatively, we can say the closed loop is stable if (and only if) the **net** number of counterclockwise encirclements of $-1+j0$ is equal to the number of RHP poles of $L(s)$. This is our main use for the Nyquist criterion, because this is how we assess stability.
 # 
 # ### Where do they get these transfer functions from?
-# Another excellent question! This is where it gets a tad more difficult, but we'll soon look at some pictures too. First, we have a quick look at the closed loop transfer function again. Our 
-# block diagram with reference $r$, output error $e$, actuation $u$, output $y$, controller $C$, and process $G$ is 
+# Another excellent question! This is where it gets a tad more difficult, but we'll soon look at some pictures too. First, we have a quick look at the closed loop transfer function again. Our block diagram with reference $r$, output error $e$, actuation $u$, output $y$, controller $C$, and process $G$ is 
 # 
 # ![](figures/CLsys.svg)
 # 
@@ -108,8 +93,7 @@ display(fig)
 # $$Y(s) = G(s)U(s) = G(s)C(s)E(s) = L(s)E(s) = L(s)(R(s)-Y(s))$$
 # $$\rightarrow (1+L(s))Y(s) = L(s)R(s) \rightarrow \frac{Y(s)}{R(s)} = \frac{L(s)}{1+L(s)}.$$
 # 
-# So we can conclude that zeros of $1+L(s)$ are poles of our closed loop system. We saw $1+L(s)$ before! *And they were talking about its zeros!!* In the Nyquist criterion, $Z$ was defined as 
-# "the number of zeros of $1+L(s)$ encircled by $\Gamma_s$" **and** "the number of poles of the closed loop system in the right half plane." We've now discovered why these are linked!
+# So we can conclude that zeros of $1+L(s)$ are poles of our closed loop system. We saw $1+L(s)$ before! *And they were talking about its zeros!!* In the Nyquist criterion, $Z$ was defined as "the number of zeros of $1+L(s)$ encircled by $\Gamma_s$" **and** "the number of poles of the closed loop system in the right half plane." We've now discovered why these are linked!
 # 
 # ### Why encirclements then?
 # This is where we start letting go of formal mathematics and start going more by visuals. If you're cool however, you can find out more about the formalities in 
@@ -132,8 +116,7 @@ drawContour(ax, cntr)
 display(fig1)
 
 # %% [markdown]
-# That's a nice semicircle of finite radius! In the end we want to 'walk along the contour' to get its mapping. So we have our complex variable $s$ for our transfer functions and this we'll walk 
-# along the contour. That looks like this:
+# That's a nice semicircle of finite radius! In the end we want to 'walk along the contour' to get its mapping. So we have our complex variable $s$ for our transfer functions and this we'll walk along the contour. That looks like this:
 
 # %%
 
@@ -151,28 +134,24 @@ display(anim)
 
 # %% [markdown]
 # ### Shuffling $L(s)$
-# Next, we will demonstrate the origin of the encirclements. We need to rewrite $L(s)$ a little first though. For a Linear Time Invariant (LTI) system the loop function can be written as a fraction 
-# of two polynomials with the respective roots being the zeros and poles of the loop function. Many words, this is it in maths
+# Next, we will demonstrate the origin of the encirclements. We need to rewrite $L(s)$ a little first though. For a Linear Time Invariant (LTI) system the loop function can be written as a fraction of two polynomials with the respective roots being the zeros and poles of the loop function. Many words, this is it in maths
 # $$ L(s) = \frac{N_L(s)}{D_L(s)} $$ 
 # and 
 # $$ 1+L(s) = \frac{N_L(s) + D_L(s)}{D_L(s)}.$$
 # From this we can see that $L(s)$ and $1+L(s)$ share the same poles, which are the roots of $D_L(s)$.
 # 
-# Suppose we call $1+L(s) = F(s)$ for now. We are interested in the zeros of $F(s)$, since these are our closed loop poles as we deduced before. Also we know that the sum of two polynomials is another polynomial, 
-# so we can write
+# Suppose we call $1+L(s) = F(s)$ for now. We are interested in the zeros of $F(s)$, since these are our closed loop poles as we deduced before. Also we know that the sum of two polynomials is another polynomial, so we can write
 # $$ F(s) = \frac{N_L(s) + D_L(s)}{D_L(s)} = \frac{N_F(s)}{D_F(s)}.$$ 
 # The roots of $N_F(s)$ are therefore zeros of $F(s)$.
 # 
 # ### Polynomials
-# We'll quickly jump into polynomials for a second. Polynomials are largely defined by their roots. For example, this is what we do when we factorize a parabola formula to find its roots. 
-# Similar to that, we can write a polynomial $N_F(s)$ as the product of its $Z$ number of roots, $z_k$, as
+# We'll quickly jump into polynomials for a second. Polynomials are largely defined by their roots. For example, this is what we do when we factorize a parabola formula to find its roots. Similar to that, we can write a polynomial $N_F(s)$ as the product of its $Z$ number of roots, $z_k$, as
 # $$ N_F(s) = (s - z_1)(s-z_2)...(s-z_Z) = \prod_{k=1}^Z (s - z_k).$$
 # Then we can also define $N_F^\dagger (s) = \prod_{k=2}^Z (s - z_k)$, such that 
 # $$N_F(s) = (s-z_1)N_F^\dagger (s).$$
 # 
 # ### Inside or outside
-# Now we're going to make two categories: zeros inside $\Gamma$ and zeros outside $\Gamma$. Let's say $z_1$ lies outside $\Gamma$ and look at the behaviour of *the phase of* $(s-z_1)$ when 
-# we walk $s$ along $\Gamma$.
+# Now we're going to make two categories: zeros inside $\Gamma$ and zeros outside $\Gamma$. Let's say $z_1$ lies outside $\Gamma$ and look at the behaviour of *the phase of* $(s-z_1)$ when we walk $s$ along $\Gamma$.
 
 # %%
 from matplotlib.patches import Arc
@@ -237,45 +216,33 @@ anim = animation.FuncAnimation(fig3, func=animate, frames=len(Q), interval=50, b
 display(anim)
 
 # %% [markdown]
-# *Wait...* was that a circle? Actually, that makes sense right? $\Gamma$ goes around $z_1$, so then it has to make a full circle. Woah okay, so $(s-z_1)$ makes a full rotation if 
-# (and yes, only if) $z_1$ is on the inside of $\Gamma$, otherwise it just oscilates.
+# *Wait...* was that a circle? Actually, that makes sense right? $\Gamma$ goes around $z_1$, so then it has to make a full circle. Woah okay, so $(s-z_1)$ makes a full rotation if (and yes, only if) $z_1$ is on the inside of $\Gamma$, otherwise it just oscilates.
 # 
 # Cool, but this is only for one zero though? What about the others? Well, remember the polynomial
 # $$ N_F(s) = \prod_{k=1}^Z (s - z_k)?$$
-# It says here that $N_F(s)$ is the product of a bunch of complex numbers. We know what that means, adding the phases! So any zero inside $\Gamma$ adds a full clockwise encirclement 
-# to $N_F(\Gamma)$ (and also $F(\Gamma)$) around **the origin**. What do the outside zeros add though? There are two options: if the zero is real, it splits $\Gamma$ exactly in half 
-# and doesn't add any phase overall, if the zero is complex it does add some phase of course. However, complex zeros come in conjugate pairs, so these phase additions cancel out because 
-# they are mirrored over the real axis.
+# It says here that $N_F(s)$ is the product of a bunch of complex numbers. We know what that means, adding the phases! So any zero inside $\Gamma$ adds a full clockwise encirclement to $N_F(\Gamma)$ (and also $F(\Gamma)$) around **the origin**. What do the outside zeros add though? There are two options: if the zero is real, it splits $\Gamma$ exactly in half and doesn't add any phase overall, if the zero is complex it does add some phase of course. However, complex zeros come in conjugate pairs, so these phase additions cancel out because they are mirrored over the real axis.
 # 
-# How do poles behave here actually? Very similar really, but since the poles are in the denominator of $F(s)$, they subtract phase rather than add. So poles inside $\Gamma$ cause 
-# counterclockwise encirclements of the origin.
+# How do poles behave here actually? Very similar really, but since the poles are in the denominator of $F(s)$, they subtract phase rather than add. So poles inside $\Gamma$ cause counterclockwise encirclements of the origin.
 # 
 # ### I forgot what we were trying to figure out
-# Yes, me too. Let's run it backwards. We know that zeros inside the contour add a full clockwise rotation and poles add a counterclockwise rotation. If we expand our finite $\Gamma$ 
-# to the infinite Nyquist contour $\Gamma_s$, this will encompass all right half plane (RHP) zeros and poles. So the number of clockwise encirclements of the origin of $F(\Gamma_s)$ 
-# equals the number of RHP zeros minus the RHP poles. That sounds very familiar! It's similar to the $N=Z-P$ equation, except that is shifted. Realise that
+# Yes, me too. Let's run it backwards. We know that zeros inside the contour add a full clockwise rotation and poles add a counterclockwise rotation. If we expand our finite $\Gamma$ to the infinite Nyquist contour $\Gamma_s$, this will encompass all right half plane (RHP) zeros and poles. So the number of clockwise encirclements of the origin of $F(\Gamma_s)$ equals the number of RHP zeros minus the RHP poles. That sounds very familiar! It's similar to the $N=Z-P$ equation, except that is shifted. Realise that
 # $$F(\Gamma_s) = 1 + L(\Gamma_s),$$
 # so encirclement of $0+j0$ by $F(\Gamma_s)$ means encirclement of $-1 + j0$ by $L(\Gamma_s)$.
 # 
 # And that's nearly it! Looking back at the practically applicable Nyquist criterion:
 # > The closed loop is stable if (and only if) the net number of counterclockwise encirclements of $-1+j0$ is equal to the number of RHP poles of $L(s)$.
 # 
-# We're missing one last step. Since $L(s)$ and $F(s)$ share the same poles, and the number of counterclockwise encirclements of $-1+j0$ is equal to the number of these poles in the 
-# RHP, the number of CCW encirclements and the number of RHP poles of $L(s)$ from the criterion are only equal if there are no RHP zeros of $F(s)$ adding clockwise encirclements. 
-# Then, since there are no RHP zeros of $F(s)$, the closed loop is stable!
+# We're missing one last step. Since $L(s)$ and $F(s)$ share the same poles, and the number of counterclockwise encirclements of $-1+j0$ is equal to the number of these poles in the RHP, the number of CCW encirclements and the number of RHP poles of $L(s)$ from the criterion are only equal if there are no RHP zeros of $F(s)$ adding clockwise encirclements. Then, since there are no RHP zeros of $F(s)$, the closed loop is stable!
 # 
 # And that is why Nyquist works in very rough strokes.
 # 
 # ### What if I'm freaky and use positive feedback?
 # Then the definition of $F(\Gamma_s) = 1 - L(\Gamma_s)$, so then $N$ is the number of encirclements around $1 + j0$. But why would you do that?
-# 
-# 
 
 # %% [markdown]
 # ## Nyquist vs. Bode, epic rap battles of history
 # 
-# We've seen both Bode plots and the Nyquist plot now. However, just a recap: Bode plots have $s=j\omega$ on the horizontal axes and on the two vertical axes is the magnitude and 
-# phase of the transfer function. We've also been looking at magnitude and phase with Nyquist so we must be able to relate the two! Lets look at a dummy loop transfer function 
+# We've seen both Bode plots and the Nyquist plot now. However, just a recap: Bode plots have $s=j\omega$ on the horizontal axes and on the two vertical axes is the magnitude and phase of the transfer function. We've also been looking at magnitude and phase with Nyquist so we must be able to relate the two! Lets look at a dummy loop transfer function 
 # $$L(s) = 150\cdot \frac{s(s-10)}{(s + 0.1)(s+50)^2}.$$
 # (Determine the poles and zeros for yourself)
 # 

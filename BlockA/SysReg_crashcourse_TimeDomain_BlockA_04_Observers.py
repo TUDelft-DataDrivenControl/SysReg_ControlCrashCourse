@@ -31,11 +31,10 @@ setPlotStyle()
 # Here you see that pair $(A^\intercal, C^\intercal)$ appear. If we design $L^\intercal$ such that the error dynamics are asymptotically stable, then the error goes to zero asymptotically. That means that we quickly get a good estimate of the state that we can use for state feedback control.
 # 
 # So we have
-# | Control   | Observe   |
-# | --------- | --------- |
-# | $K = \texttt{cm.place}(A, B, p)$      | $L.T = \texttt{cm.place}(A.T, C.T, p)$       |
+# | Control   | Observe   | #
+# | --------- | --------- | #
+# | $K = \texttt{cm.place}(A, B, p)$      | $L.T = \texttt{cm.place}(A.T, C.T, p)$       | #
 # | $W_r = \begin{bmatrix}B & AB & \cdots & A^{n-1}B\end{bmatrix}$ | $W_o^\intercal = \begin{bmatrix}C^\intercal & (CA)^\intercal & \cdots & (CA^{n-1})^\intercal\end{bmatrix}$ |
-# 
 # 
 # This *observability matrix*, $W_o$, is the dual twin of the controlability matrix. If it has full rank, the system is *observable*.
 # 

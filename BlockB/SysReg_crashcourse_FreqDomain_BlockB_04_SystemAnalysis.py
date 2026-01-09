@@ -13,14 +13,12 @@ setPlotStyle()
 
 # %% [markdown]
 # ## Performance Margins
-# As established in block A: *our model is always terrible*. Therefore, we might want to know how prone our controller is to destabilizing the system, because our model is wrong. There are three popular measures for 
-# this: the gain margin, the phase margin, and the stability margin. They're quite easy:
+# As established in block A: *our model is always terrible*. Therefore, we might want to know how prone our controller is to destabilizing the system, because our model is wrong. There are three popular measures for this: the gain margin, the phase margin, and the stability margin. They're quite easy:
 # - Gain margin $g$: $\argmin_{g}$ such that $g L(s)$ becomes unstable,
 # - Phase margin $\phi$: $\argmin_{|\phi|}$ such that $e^{\phi i}L(s)$ becomes unstable (think about how that translates to a time delay!),
 # - Stability margin $s_m$: minimal distance between Nyquist plot, $L(\Gamma_s)$, and the point -1.
 # 
-# You can read the gain and phase margins from a bode plot, but not the stability margin. In this sense a Nyquist plot contains more information than a Bode plot. Anyways, lets plot those margins for a 
-# loop function.
+# You can read the gain and phase margins from a bode plot, but not the stability margin. In this sense a Nyquist plot contains more information than a Bode plot. Anyways, lets plot those margins for a loop function.
 
 # %%
 OM = np.logspace(-2, 4.5, 700)
@@ -106,8 +104,7 @@ display(fig, fig2)
 
 # %% [markdown]
 # ## Minimum Phase Systems
-# Minimum phase systems (MPS) are systems where the phase is the absolute minimum possible value for any given magnitude. Defined the other way around: MPS are systems without phase addition from factors not 
-# contributing to the magnitude. These factors are only time-delays and RHP zeros. Lets look at the difference between a LHP and RHP zero:
+# Minimum phase systems (MPS) are systems where the phase is the absolute minimum possible value for any given magnitude. Defined the other way around: MPS are systems without phase addition from factors not contributing to the magnitude. These factors are only time-delays and RHP zeros. Lets look at the difference between a LHP and RHP zero:
 # 
 # **The gains of these blocks are different! To prevent them from overlaying.**
 # 
@@ -134,24 +131,18 @@ ax[0].legend()
 display(fig)
 
 # %% [markdown]
-# This demonstrates the main troubles with RHP zeros: they cause a lot of phase loss, causing stability and performance limitations. One of these limitations is for example demonstrated through the 
-# [root locus](https://en.wikipedia.org/wiki/Root_locus_analysis) (which is a very cool topic). In a very limited statement, the root locus says that closed-loop poles move towards zeros for increasingly higher 
-# gain feedback. If there is a RHP zero, that means that for high gains at some point a closed loop pole will move to the RHP, destabilising the feedback system. Therefore, there is a limit to the feedback gain
-# you can set. You've seen before too that time delays incur a huge phase loss.
+# This demonstrates the main troubles with RHP zeros: they cause a lot of phase loss, causing stability and performance limitations. One of these limitations is for example demonstrated through the [root locus](https://en.wikipedia.org/wiki/Root_locus_analysis) (which is a very cool topic). In a very limited statement, the root locus says that closed-loop poles move towards zeros for increasingly higher gain feedback. If there is a RHP zero, that means that for high gains at some point a closed loop pole will move to the RHP, destabilising the feedback system. Therefore, there is a limit to the feedback gain you can set. You've seen before too that time delays incur a huge phase loss.
 
 # %% [markdown]
 # <div style="text-align:center;background-color:orange;color:black;">Maybe this entire Bode block should be a seperate deep dive page...</div>
 # 
 # ## Bodes phase-magnitude relation
-# Bode has one last curve-ball for you lovely people, he has a relation named after him that couples the phase and gain of TFs for minimum phase systems. We'll look into that more in a bit, 
-# first Bode's relation. Be warned, it's not pretty at first sight: the relation is defined in Eq. 2.10 of Skogestad as
+# Bode has one last curve-ball for you lovely people, he has a relation named after him that couples the phase and gain of TFs for minimum phase systems. We'll look into that more in a bit, first Bode's relation. Be warned, it's not pretty at first sight: the relation is defined in Eq. 2.10 of Skogestad as
 # $$ \angle G(i\Omega) = \frac{1}{\pi}\int_{-\infty}^{\infty}\underbrace{\frac{\text{d}\log|G(i\omega)|}{\text{d}\log(\omega)}}_{N(\omega)}\;\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|
 # \frac{\text{d}\omega}{\omega} \approx 90^\circ N(\omega).$$
-# Now my issue with this is that the integral is from $-\infty$ onwards, but that $\log(x)$ is not defined for $x\leq0$, and there are many logarithms. Investigating 
-# those three factors one by one:
+# My issue with this is that the integral is from $-\infty$ onwards, but that $\log(x)$ is not defined for $x\leq0$, and there are many logarithms. Investigating those three factors one by one:
 # 
-# $\frac{\text{d}\log|G(i\omega)|}{\text{d}\log(\omega)}=N(\omega)$ is a derivative. As we've seen before, this is just the slope of the log-log graph for positive frequencies and for negative
-# frequencies it's the same but negative. I do have some issues with the notation of the denominator though.
+# $\frac{\text{d}\log|G(i\omega)|}{\text{d}\log(\omega)}=N(\omega)$ is a derivative. As we've seen before, this is just the slope of the log-log graph for positive frequencies and for negative frequencies it's the same but negative. I do have some issues with the notation of the denominator though.
 # 
 # $\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|$ is a bit weirder, but logarithms of an absolute value, so we're good for negative values. Let's do some simplifications
 # $$ \log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| = \log\frac{|\omega+\Omega|}{|\omega-\Omega|} = \log|\omega+\Omega| - \log|\omega-\Omega|.$$
@@ -159,8 +150,7 @@ display(fig)
 # 
 # Lastly, there is $\frac{1}{\omega}$, causing problems when $\omega=0$.
 # 
-# Now also why in tarnation is that first approximation true? That has exactly to do with the problems described just now. Lets have a gander at the function $\frac{1}{\omega}\log
-# \left|\frac{\omega+\Omega}{\omega-\Omega}\right|$. We plot it for some values of $\Omega$:
+# Now also why in tarnation is that first approximation true? That has exactly to do with the problems described just now. Lets have a gander at the function $\frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|$. We plot it for some values of $\Omega$:
 # 
 # %%
 W = [.8, 2., 2.3]
@@ -174,7 +164,7 @@ display(fig)
 # %% [markdown]
 # Spiky plot, but what's happening at those discontinuities? So turns out that 
 # $$\lim_{w\rightarrow\Omega} \frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| =  \frac{1}{\Omega}\log|2\Omega| - \lim_{w\rightarrow\Omega}\frac{1}{\Omega}\log|\omega-\Omega| =\infty,$$
-#  since $\log(0^+)=-\infty$. 
+# since $\log(0^+)=-\infty$. 
 # Now for 
 # $$\lim_{w\rightarrow-\Omega} \frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| = \frac{1}{\Omega}\log|-2\Omega| - \frac{1}{\Omega}\lim_{w\rightarrow-\Omega} \log|\omega+\Omega| =\infty.$$
 # Therefore, we have peaks up to infinity at $\omega=\pm\Omega$. The limit at $\omega=0$ is annoying and I don't want to do it, because
@@ -190,8 +180,7 @@ ax.plot(W_, 2./W_, 'k--')
 display(fig)
 
 # %% [markdown]
-# *As you can see*, **obviously** $ \lim_{w\rightarrow0} \frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| =  \frac{2}{\Omega}$. Now this explanation has gotten muddy, what you need 
-# to realise about $\frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|$ for the next step is that it's infinte at $\pm\Omega$ and finite everywhere else. 
+# *As you can see*, **obviously** $ \lim_{w\rightarrow0} \frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right| =  \frac{2}{\Omega}$. Now this explanation has gotten muddy, what you need to realise about $\frac{1}{\omega}\log\left|\frac{\omega+\Omega}{\omega-\Omega}\right|$ for the next step is that it's infinte at $\pm\Omega$ and finite everywhere else. 
 # 
 # The next step is to realise that you can approximate this with a Dirac-delta impulse that we saw in block A with the impulse response. To define that impulse, $\delta(t)$, a bit more precisely:
 # $$\delta(t) = \infty \text{ for } t = 0,\; \delta(t) = 0 \text{ otherwise, and } \int_{-\infty}^\infty\delta(t)=1.$$
@@ -204,7 +193,7 @@ display(fig)
 # \frac{\text{d}\omega}{\omega} \approx \frac{1}{\pi}\int_{-\infty}^{\infty}N(\omega)\frac{\pi^2}{2}\delta(\omega - \Omega) = \frac{\pi}{2}N(\Omega) = 90^\circ N(\Omega).$$
 # Tadaaa🎊
 # 
-# Now lets see how good this approximation is:
+# Lets see how good this approximation is:
 # %%
 OM = np.logspace(-3, 3, 700)
 S = OM*1j
@@ -243,43 +232,24 @@ display(fig)
 # ![General feedback loop](figures/CLsys_general.svg)
 # 
 # Then the complete transfer function collection is
-# $$ \begin{bmatrix} y \\ \eta \\ v \\ u \\ e \end{bmatrix} = \frac{1}{1+PC}
-# \begin{bmatrix} 
-# PCF   & P     & 1     \\
-# PCF   & P     & -PC   \\
-# CF    & 1     & -C    \\
-# CF    & -PC   & -C    \\
-# F     & -P    & -1    
-# \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} \triangleq
-# \begin{bmatrix} 
-# TF   & PS     & S     \\
-# TF   & PS     & -T   \\
-# CFS  & S      & -CS    \\
-# CFS  & -T     & -CS    \\
-# FS   & -PS    & -S    
-# \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} ,$$
+# $$ \begin{bmatrix} y \\ \eta \\ v \\ u \\ e \end{bmatrix} = \frac{1}{1+PC}\begin{bmatrix} PCF   & P     & 1     \\PCF   & P     & -PC   \\CF    & 1     & -C    \\CF    & -PC   & -C    \\F     & -P    & -1    \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} \triangleq\begin{bmatrix} TF   & PS     & S     \\TF   & PS     & -T   \\CFS  & S      & -CS    \\CFS  & -T     & -CS    \\FS   & -PS    & -S    \end{bmatrix} \begin{bmatrix} r \\ d \\ n \end{bmatrix} ,$$
 # where $S=\frac{1}{1+PC}=\frac{1}{1+L}$ is called the sensitivity function and $T=\frac{PC}{1+PC}=\frac{L}{1+L}=SL$ is called the complementary sensitivity function. They're called complements because
 # $$ S + T = \frac{1}{1+PC} + \frac{PC}{1+PC} = 1.$$
 # 
 # ## What about the performance?
-# Fun fact: you can derive the effectiveness of feedback control from that transfer matrix. Looking at the last row which represents the transfers from the reference and disturbances
-# to the tracking error, $e$. The smaller this error, the better the feedback control is performing. Now also note that every element in this last row is right multiplied with $S$, meaning that smaller magnitudes
-# of $S$ result in smaller tracking errors. So
+# Fun fact: you can derive the effectiveness of feedback control from that transfer matrix. Looking at the last row which represents the transfers from the reference and disturbances to the tracking error, $e$. The smaller this error, the better the feedback control is performing. Now also note that every element in this last row is right multiplied with $S$, meaning that smaller magnitudes of $S$ result in smaller tracking errors. So
 # - $|S(s)| < 1 \rightarrow $ disturbances are attenuated/rejected (this is good),
 # - $|S(s)| = 1 \rightarrow $ equivalent to open loop control (meh),
 # - $|S(s)| > 1 \rightarrow $ disturbances are amplified (this is bad).
 # 
-# We've looked at controller performance before with the gain, phase, and stability margins. Of course these are still valid and we'll build further on this. Just to reframe that theory, we have to define
-# the cross-over frequencies $\omega_\text{gc}\leftarrow|L(\omega_\text{gc})|=1$ and $\omega_\text{pc}\leftarrow\angle L(\omega_\text{pc})=\pm 180^\circ$ for the gain and phase cross-overs.
-# Then the gain margin GM $=1/|L(\omega_\text{pc})|$ and phase margin PM $=180^\circ - |\angle L(\omega_\text{gc})|$.
+# We've looked at controller performance before with the gain, phase, and stability margins. Of course these are still valid and we'll build further on this. Just to reframe that theory, we have to define the cross-over frequencies $\omega_\text{gc}\leftarrow|L(\omega_\text{gc})|=1$ and $\omega_\text{pc}\leftarrow\angle L(\omega_\text{pc})=\pm 180^\circ$ for the gain and phase cross-overs. Then the gain margin GM $=1/|L(\omega_\text{pc})|$ and phase margin PM $=180^\circ - |\angle L(\omega_\text{gc})|$.
 # 
-# With our new theory we can also define the closed loop bandwidth, $\omega_\text{B}$, of our controlled system! This is a measure of until what frequency we can reject disturbances and it's defined as the 
-# frequency where $|T(s)|$ first crosses $\frac{1}{\sqrt2}\approx0.707\approx -3$ dB from above.
+# With our new theory we can also define the closed loop bandwidth, $\omega_\text{B}$, of our controlled system! This is a measure of until what frequency we can reject disturbances and it's defined as the frequency where $|T(s)|$ first crosses $\frac{1}{\sqrt2}\approx0.707\approx -3$ dB from above.
 # 
 # Now for the stability margin, $s_m$, that we defined earlier as the minimal distance between $L(s)$ and the point -1. Equivalently, this is the minimum of $|1 + L(s)|$, which coincidentally is the denominator of $S$. 
 # Therefore the stability margin occurs when the sensitivity function magnitude is the largest. Utilising that property, we define
 # $$ M_S = \max |S(s)| = \frac{1}{s_m} .$$
-# Now we have to perform some geometry magic, but to explain that we need an exampe Nyquist plot
+# So we have to perform some geometry magic, but to explain that we need an exampe Nyquist plot
 
 # %%
 L2 = lambda s :  1.2 / (s+.7)**3
@@ -334,8 +304,7 @@ print(f"Stability margin = {s_m:1.2f}")
 display(fig)
 
 # %% [markdown]
-# So lets have a gander at what this plot tells us, starting with the gain margin. We can say for sure that the Nyquist plot on the real axis is *at least* as far away as $s_m$, 
-# otherwise that would be the stability margin. So we have $s_m \leq 1 - \frac{1}{\text{GM}}$ from that statement, and some rewriting gives
+# Lets have a gander at what this plot tells us, starting with the gain margin. We can say for sure that the Nyquist plot on the real axis is *at least* as far away as $s_m$, otherwise that would be the stability margin. So we have $s_m \leq 1 - \frac{1}{\text{GM}}$ from that statement, and some rewriting gives
 # $$ s_m \leq 1 - \frac{1}{\text{GM}} \rightarrow 1 - s_m \geq \frac{1}{\text{GM}} \rightarrow \text{GM} \geq \frac{1}{1 - s_m} .$$
 # Coupling back to $M_S$:
 # $$ \frac{1}{1 - s_m} = \frac{M_S}{M_S - 1} \leq \text{GM}.$$
@@ -374,11 +343,9 @@ ax.legend(handles=l)
 display(fig)
 
 # %% [markdown]
-# What does this triangle whisper in the night? Well first of all that $P = L(i\omega_\text{gc})$ and $Q = \frac12(P - 1)$, and per definition $\angle (-1,0,P) = $ PM. From similarity you 
-# also get the bisection property $\angle (-1,0,Q) = \frac12$ PM and note that $\angle (P,Q,0)$ is a right angle. Then, the length of $(-1, P)$ is 
+# What does this triangle whisper in the night? Well first of all that $P = L(i\omega_\text{gc})$ and $Q = \frac12(P - 1)$, and per definition $\angle (-1,0,P) = $ PM. From similarity you also get the bisection property $\angle (-1,0,Q) = \frac12$ PM and note that $\angle (P,Q,0)$ is a right angle. Then, the length of $(-1, P)$ is 
 # $$|P+1|=|L(i\omega_\text{gc})+1|=\frac{1}{|S(i\omega_\text{gc})|}=2\sin(\frac12\text{PM}) \rightarrow |S(i\omega_\text{gc})| = \frac{1}{2\sin(\frac12\text{PM})}$$
-# Now as a last step, per definition of the stability margin $|P+1|\geq s_m$. Therefore, $2\sin(\frac12\text{PM}) \geq s_m$ and $M_S \leq 
-# \frac{1}{2\sin(\frac12\text{PM})}$. Isolating PM gives
+# Now as a last step, per definition of the stability margin $|P+1|\geq s_m$. Therefore, $2\sin(\frac12\text{PM}) \geq s_m$ and $M_S \leq \frac{1}{2\sin(\frac12\text{PM})}$. Isolating PM gives
 # $$PM \geq 2\arcsin(\frac{1}{2 M_S}).$$
 # DONE. Now if we get $M_S=2$, we are guaranteed to have a gain margin more than 2 and a phase margin more than $29^\circ$, guaranteeing good performance.
 # 

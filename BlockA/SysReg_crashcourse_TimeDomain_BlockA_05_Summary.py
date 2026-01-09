@@ -16,8 +16,7 @@ setPlotStyle()
 # ## Connecting the dots
 # 
 # Time to make the full picture: state feedback control with state estimation! Some important things to note:
-# - Since the state feedback is based on the state estimation, we want the error to go to zero faster than the controller works. If the controller is faster than the observer you're just doing 
-# random stuff basically until the estimate converges. Rule of thumb: the observer should be 4 to 10 times faster (larger magnitude poles) than the controller.
+# - Since the state feedback is based on the state estimation, we want the error to go to zero faster than the controller works. If the controller is faster than the observer you're just doing random stuff basically until the estimate converges. Rule of thumb: the observer should be 4 to 10 times faster (larger magnitude poles) than the controller.
 # - Making the observer extremely fast works well in theory, but as soon as your output is noisy, the fast observer will amplify this noise enourmously and your estimate will be terrible.
 # - In the example below I'll make an LQR observer, but since the observer is a regulator type controller, no feedforward gain is needed.
 # - Strictly speaking you can classify this as output feedback
