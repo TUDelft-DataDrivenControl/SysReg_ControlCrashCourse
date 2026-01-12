@@ -1,11 +1,9 @@
 import numpy as np
 
 import matplotlib.pyplot as plt
-import numpy.random as rng
-import scipy as sp
-import control as cm
-from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import MultipleLocator
+import matplotlib.patches as ptc
+import control as cm
 from IPython.display import display, Markdown
 
 def setPlotStyle():
@@ -13,7 +11,7 @@ def setPlotStyle():
                             'font.size':          12.0,               'axes.labelsize':           'medium',
                             'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
                             'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                            'grid.alpha':         0.5,                'figure.figsize':           [11.0, 4],
+                            'grid.alpha':         0.5,                'figure.figsize':           [15.0, 8],
                             'figure.constrained_layout.use': True,    'scatter.marker':           'x',
                             'animation.html':     'jshtml'})
 
@@ -68,6 +66,21 @@ def drawContour(ax, cntr, c=[0.1,0.7,0.8], ls='--'):## Plot contour
     ax.set(aspect = 'equal', xlabel="$\mathfrak{Re}\{G(s)\}$", ylabel="$\mathfrak{Im}\{G(s)\}$")
     return l
 
+def setGridPolar(ax, Mticks=None, Np=None):
+    if Mticks is None: Mticks = np.arange(-2, 3)
+    if type(Mticks) == list: Mticks = np.array(Mticks)
+    M = 10.**Mticks
+    [ax.add_patch(ptc.Circle((0., 0.), m, ec='k', color='none', alpha=.2, label='_nolegend_')) for m in M]
+
+    if Np is None: Np = 4
+    P = (np.linspace(-.5, 0., Np//2 + 1))[1:-1] *np.pi
+    P = np.append(-np.flip(P), P)
+    N = np.logspace(min(Mticks), max(Mticks), 50)
+    N = np.append(np.flip(-N), N)
+    [ax.plot(np.real(N * np.exp(p*1j)), np.imag(N * np.exp(p*1j)), color='k', alpha=.2, lw=.5, label='_nolegend_') for p in P]
+    
+
+
 def unwrap_angle(ang):
     for idx in range(ang.size - 1):
         if ang[idx+1] - ang[idx] > 180:
@@ -75,6 +88,7 @@ def unwrap_angle(ang):
         elif ang[idx+1] - ang[idx] < -180:
             ang[idx+1:] += 360
     return ang
+
 class loopShaper():
     def __init__(self, inputNoise=False, outputNoise=False):
         self.Czeros = []

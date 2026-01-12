@@ -23,6 +23,8 @@ setPlotStyle()
 # - a complex zero pair, with natural frequency $\omega_z$ and damping ration $\zeta_z$,
 # - a time-delay, $e^{-\tau_1 s}$, that delays with $\tau_1$ time
 
+# I add some extra gridlines here, to give a little more feeling for the symmetrix log scale: Constant magnitude circles, and radial lines at angles $[\frac14\pi, \frac12\pi, \frac34\pi]$.
+
 # %% 
 k1, p1, z1 = 1e-2, 0.3, 7.                  #CHANGEME
 om_p, zeta_p, om_z, zeta_z = .1, .1, 4., 2. #CHANGEME
@@ -44,6 +46,7 @@ G2_eval = [G(S) for G in G2]
 fig = plt.figure(num="Bode plot blocks")
 gs = GridSpec(2,2, figure=fig)
 ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
+setGridPolar(ax[0], Mticks=[0, 1, 2, 4], Np=8)
 
 for G_eval in G2_eval:
     ax[0].plot(G_eval.real, G_eval.imag)
@@ -53,8 +56,8 @@ for G_eval in G2_eval:
 ax[0].legend([rf"${k1:.2f}$",
               rf"$\frac{"{"}1{"}"}{"{"}s + {p1:.2f}{"}"}$",
               rf"$s + {z1:.2f}$",
-              rf"$\frac{"{"}1{"}"}{"{"}s^2 + 2 \cdot {zeta_p:.2f} \cdot {om_p:.2f}s + {om_p:.2f}^2{"}"}$",
-              rf"$s^2 + 2 \cdot {zeta_z:.2f} \cdot {om_z:.2f}s + {om_z:.2f}^2$",
+              rf"$\frac{"{"}1{"}"}{"{"}s^2 + 2 \cdot {zeta_p:.1f} \cdot {om_p:.1f}s + {om_p:.1f}^2{"}"}$",
+              rf"$s^2 + 2 \cdot {zeta_z:.1f} \cdot {om_z:.1f}s + {om_z:.1f}^2$",
               rf"$e^{"{"}-{tau1:.3f}a{"}"}$",
               ], fontsize='small')
 
@@ -65,7 +68,7 @@ for G_eval, idx in zip(G2_eval, range(len(G2_eval))):
 
 ax[0].set(title="Imaginary plane", 
           xlabel="$\mathfrak{Re}\{G(s)\}$", ylabel="$\mathfrak{Im}\{G(s)\}$", 
-          xscale='symlog', yscale='symlog')
+          xscale='symlog', yscale='symlog', aspect='equal')
 ax[1].set(title="Bode plot", ylabel = "$|G(s)|$")
 ax[2].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[2].yaxis.set_major_locator(MultipleLocator(90))

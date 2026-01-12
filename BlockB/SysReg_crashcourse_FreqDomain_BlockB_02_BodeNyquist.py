@@ -26,12 +26,12 @@ setPlotStyle()
 # Now we want to visualise the behaviour of $G$, since that gives us a ton of information on that steady state input-output behaviour of the system. This can be done with *Bode* plots.
 #  **Important: Bode plots use the Fourier transform, so $s=i\omega$ !**
 # 
-# So Bode follows the following rationale: $G$ maps the imaginary axis (pure sinusoids in time domain) to some other curve in the complex plane, not on the imaginary axis per se. Any complex number can be defined through their modulus/magnitude/gain and argument/angle/phase, so plotting these against the oscillation frequency, $\omega$, defines the curve in the complex plane. The gain is usually plotted on a log-log scale and the phase on a lin-log scale. Lets have a look at how that looks like for the simplest functions, $G = s^n$.
+# So Bode follows the following rationale: $G$ maps the imaginary axis (pure sinusoids in time domain) to some other curve in the complex plane, not on the imaginary axis per se. Any complex number can be defined through their modulus/magnitude/gain and argument/angle/phase, so plotting these against the oscillation frequency, $\omega$, defines the curve in the complex plane. The gain is usually plotted on a log-log scale and the phase on a lin-log scale. Lets have a look at how that looks like for the simplest functions, $G = s^n$. Also I draw some extra constant magnitude lines in the grid of the complex plane. These constant magnitudes seem weirdly squished, but that's just the symmetric log scale.
 
 # %%
 N = range(-2,3)
 G1 = [lambda s, n=n : s**n for n in N]
-OM = np.logspace(-2, 2)
+OM = np.logspace(-1, 2, 20)
 S = OM*1j
 G1_eval = [G(S) for G in G1]
 
@@ -40,6 +40,7 @@ fig = plt.figure(num="Bode plot intro")
 gs = GridSpec(2,2, figure=fig)
 ax = [fig.add_subplot(a) for a in [gs[:, 0], gs[0, 1], gs[1, 1]]]
 
+setGridPolar(ax[0], Mticks=[0, 1, 2, 4], Np=0)
 [ax[0].plot(G_eval.real, G_eval.imag, 'x' if n >= 0 else 'o', c='none', mec=f"C{idx}") 
         for G_eval, n, idx in zip(G1_eval, N, range(len(N)))]
 hnd = [ax[1].loglog(OM, np.abs(G_eval), label=f"$s^{"{"}{n}{"}"}$")[0] 
@@ -47,7 +48,8 @@ hnd = [ax[1].loglog(OM, np.abs(G_eval), label=f"$s^{"{"}{n}{"}"}$")[0]
 [ax[2].semilogx(OM, np.angle(G_eval, deg=True)) for G_eval in G1_eval]
 ax[0].set(title="Imaginary plane", 
           xlabel="$\mathfrak{Re}\{G(s)\}$", ylabel="$\mathfrak{Im}\{G(s)\}$", 
-          xscale='symlog', yscale='symlog')
+          xscale='symlog', yscale='symlog',
+          aspect='equal')
 ax[1].set(title="Bode plot", ylabel = "$|G(s)|$")
 ax[2].set(xlabel = r"$\omega$", ylabel = r"$\angle G(s)$ / ${}^\circ$")
 ax[2].yaxis.set_major_locator(MultipleLocator(90))
@@ -96,8 +98,7 @@ display(fig)
 # So we can conclude that zeros of $1+L(s)$ are poles of our closed loop system. We saw $1+L(s)$ before! *And they were talking about its zeros!!* In the Nyquist criterion, $Z$ was defined as "the number of zeros of $1+L(s)$ encircled by $\Gamma_s$" **and** "the number of poles of the closed loop system in the right half plane." We've now discovered why these are linked!
 # 
 # ### Why encirclements then?
-# This is where we start letting go of formal mathematics and start going more by visuals. If you're cool however, you can find out more about the formalities in 
-# [Cauchy's argument principle](https://en.wikipedia.org/wiki/Argument_principle). It'll take a couple of steps to arrive at the source of the encirclements, but no worries. We'll go through it step by step. 
+# This is where we start letting go of formal mathematics and start going more by visuals. If you're cool however, you can find out more about the formalities in [Cauchy's argument principle](https://en.wikipedia.org/wiki/Argument_principle). It'll take a couple of steps to arrive at the source of the encirclements, but no worries. We'll go through it step by step. 
 # 
 # ### First the contour
 # We'll not go for the full Nyquist contour $\Gamma_s$ immediately, but first take a smaller contour $\Gamma$. Lets define that!
