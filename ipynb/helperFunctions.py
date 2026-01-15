@@ -11,7 +11,7 @@ def setPlotStyle():
                             'font.size':          12.0,               'axes.labelsize':           'medium',
                             'xtick.labelsize':    'x-small',          'ytick.labelsize':          'x-small',
                             'axes.grid':          True,               'axes.formatter.limits':    [-3, 6],
-                            'grid.alpha':         0.5,                'figure.figsize':           [15.0, 8],
+                            'grid.alpha':         0.5,                'figure.figsize':           [14, 6],
                             'figure.constrained_layout.use': True,    'scatter.marker':           'x',
                             'animation.html':     'jshtml'})
 
