@@ -7523,7 +7523,7 @@ $$ \dot x = f(x, u)$$
 $$ y = h(x, u),$$
 where $x$ is the state of the system, $u$ the input, and $y$ the output. The state dynamics are described with $f: \mathbb{R}^n\times\mathbb{R}^p\rightarrow\mathbb{R}^n$ and the output measurements with $h: \mathbb{R}^n\times\mathbb{R}^p\rightarrow\mathbb{R}^q$.</p>
 <p>What black magic do we perform to get these first order ODEs? Well, suppose you have a second order ODE in $v$, $\ddot v = \dot v + v$, then this is equivalent to the first order ODE
-$$ \begin{bmatrix}\dot v\\\ddot v\end{bmatrix}  = \begin{bmatrix}0&amp;1\\1&amp;1\end{bmatrix}\begin{bmatrix}\dot v\\ v\end{bmatrix}.$$</p>
+$$ \begin{bmatrix}\dot v\\\ddot v\end{bmatrix}  = \begin{bmatrix}\dot v\\ \dot v + v\end{bmatrix} = \begin{bmatrix}0&amp;1\\1&amp;1\end{bmatrix}\begin{bmatrix}\dot v\\ v\end{bmatrix}.$$</p>
 <p>Last but not least of the amazing aspects of the state space representation: there are many nice numerical integrators to simulate them. Think forward Euler or Runge-Kutta.</p>
 </div>
 </div>
